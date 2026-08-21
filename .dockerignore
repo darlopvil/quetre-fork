@@ -1,0 +1,13 @@
+.git
+.gitignore
+node_modules
+.env
+.env.example
+.vscode
+dev-data
+dump.rdb
+public/css
+*.md
+Dockerfile
+.dockerignore
+docker-compose*.yml

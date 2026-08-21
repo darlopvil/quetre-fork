@@ -1,11 +1,16 @@
-FROM node:alpine3.17
+FROM node:22-alpine AS build
 WORKDIR /app
+RUN npm i -g pnpm@8
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+COPY . .
+RUN pnpm run sass:build
+RUN pnpm prune --prod
 
-RUN apk update && apk add git   
-RUN git clone https://github.com/zyachel/quetre .
-RUN npm i -g pnpm
-RUN pnpm install
-
+FROM node:22-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build --chown=node:node /app ./
+USER node
 EXPOSE 3000
-
-CMD ["pnpm", "start"]
+CMD ["node", "server.js"]
