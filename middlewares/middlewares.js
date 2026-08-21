@@ -47,30 +47,35 @@ export const checkCache = cacheKeyFunction =>
     res.locals.cacheKey = key;
 
     const raw = await redis.get(key);
-    if (!raw) return next();
 
-    let entry;
-    try {
-      entry = JSON.parse(raw);
-    } catch {
-      return next();
-    }
-    if (typeof entry?.freshUntil !== 'number') return next();
+    if (raw) {
+      let entry;
+      try {
+        entry = JSON.parse(raw);
+      } catch {
+        entry = null;
+      }
 
-    if (entry.freshUntil > Date.now()) {
-      res.locals.data = entry.data;
-      res.locals.fromCache = true;
-      await redis.expire(key, hardTtl, 'GT');
-    } else {
-      res.locals.stale = entry.data;
-      res.locals.staleSince = entry.freshUntil;
+      if (typeof entry?.freshUntil === 'number') {
+        if (entry.freshUntil > Date.now()) {
+          res.locals.data = entry.data;
+          res.locals.fromCache = true;
+          await redis.expire(key, hardTtl, 'GT');
+          return next();
+        }
+        res.locals.stale = entry.data;
+        res.locals.staleSince = entry.freshUntil;
+      }
     }
-    if (!res.locals.data && !res.locals.stale) {
+
+    // sin copia utilizable en Redis: recurrimos al archivo permanente
+    if (!res.locals.stale) {
       const archived = await storeGet(key);
       if (archived) {
         res.locals.stale = archived.data;
         res.locals.staleSince = archived.savedAt;
       }
     }
+
     next();
   });

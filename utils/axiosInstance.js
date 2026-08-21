@@ -15,7 +15,7 @@ const buildClientHints = ua => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: 'https://www.quora.com',
+  baseURL: env.QUORA_BASE_URL,
   headers: {
     'User-Agent': env.USER_AGENT,
     Accept: env.ACCEPT,

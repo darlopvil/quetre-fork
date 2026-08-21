@@ -1,6 +1,7 @@
 import process from 'node:process';
 
 const env = {
+  QUORA_BASE_URL: process.env.QUORA_BASE_URL || 'https://www.quora.com',
   FLARESOLVERR_URL: process.env.FLARESOLVERR_URL,
   FLARESOLVERR_TIMEOUT: Number(process.env.FLARESOLVERR_TIMEOUT) || 120000,
   NODE_ENV: process.env.NODE_ENV || 'development',
