@@ -4,8 +4,7 @@ import { requestsState } from '../utils/state.js';
 import catchAsyncErrors from '../utils/catchAsyncErrors.js';
 import redis, { ttl, hardTtl } from '../utils/redis.js';
 import env from '../utils/env.js';
-import { storeSet } from '../utils/store.js';
-
+import { storeSet, storeGet } from '../utils/store.js';
 
 /** @type {import("express").RequestHandler} */
 export const formatReq = (req, _res, next) => {
@@ -66,6 +65,12 @@ export const checkCache = cacheKeyFunction =>
       res.locals.stale = entry.data;
       res.locals.staleSince = entry.freshUntil;
     }
-
+    if (!res.locals.data && !res.locals.stale) {
+      const archived = await storeGet(key);
+      if (archived) {
+        res.locals.stale = archived.data;
+        res.locals.staleSince = archived.savedAt;
+      }
+    }
     next();
   });
