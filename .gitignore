@@ -5,3 +5,5 @@ dev-data/*
 public/css/*
 dump.rdbdocker-compose.yml
 dumps/dumps/
+store/
+store/

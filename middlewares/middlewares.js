@@ -4,6 +4,7 @@ import { requestsState } from '../utils/state.js';
 import catchAsyncErrors from '../utils/catchAsyncErrors.js';
 import redis, { ttl, hardTtl } from '../utils/redis.js';
 import env from '../utils/env.js';
+import { storeSet } from '../utils/store.js';
 
 
 /** @type {import("express").RequestHandler} */
@@ -37,6 +38,7 @@ export const setCache = catchAsyncErrors(async (_req, res, next) => {
 
   const entry = { data: res.locals.data, freshUntil: Date.now() + ttl * 1000 };
   await redis.set(res.locals.cacheKey, JSON.stringify(entry), 'EX', hardTtl);
+  await storeSet(res.locals.cacheKey, res.locals.data);
   next();
 });
 

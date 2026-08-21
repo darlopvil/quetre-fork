@@ -4,6 +4,7 @@ import AppError from '../utils/AppError.js';
 import parse from '../utils/parse.js';
 import upstreamError from '../utils/upstreamError.js';
 import enqueue from '../utils/queue.js';
+import dumpBody from '../utils/dumpBody.js';
 
 /**
  * makes a call to quora.com(with the resourceStr appended) and returns parsed JSON containing the data about the resource requested.
@@ -18,7 +19,7 @@ const fetcher = async (resourceStr, { keyword, lang, toEncode = true }) => {
   try {
     // as url might contain unescaped chars. so, encoding it right away
     const str = toEncode ? encodeURIComponent(resourceStr) : resourceStr;
-        const res = await enqueue(() =>
+    const res = await enqueue(() =>
       axiosInstance.get(str, { baseURL: getBaseUrl(lang) })
     );
 
@@ -37,7 +38,7 @@ const fetcher = async (resourceStr, { keyword, lang, toEncode = true }) => {
       return true;
     });
 
-    if (!rawData.question) {
+    if (!rawData) {
       const file = await dumpBody(res.data, resourceStr);
       const e = new AppError('Quora no ha devuelto los datos de la página.', 502);
       e.code = 'EMPTY_PAYLOAD';

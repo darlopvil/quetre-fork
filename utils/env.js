@@ -19,6 +19,7 @@ const env = {
   RATE_LIMIT_COOLDOWN: Number.isNaN(+process.env.RATE_LIMIT_COOLDOWN)
     ? 7_200_000
     : Number(process.env.RATE_LIMIT_COOLDOWN),
+  STORE_DIR: process.env.STORE_DIR ?? '/app/store',
 };
 
 export default env;
