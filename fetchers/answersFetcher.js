@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio';
 import axiosInstance, { getBaseUrl } from '../utils/axiosInstance.js';
 import AppError from '../utils/AppError.js';
 import parse from '../utils/parse.js';
+import upstreamError from '../utils/upstreamError.js';
 
 /**
  * @param {string} resourceStr a string after the baseURL
@@ -46,18 +47,17 @@ const answersFetcher = async (resourceStr, lang) => {
       }
     });
 
-    if (!rawData.question) throw new AppError("couldn't retrieve data", 500);
+    if (!rawData.question) {
+      const file = await dumpBody(res.data, resourceStr);
+      const e = new AppError('Quora no ha devuelto los datos de la página.', 502);
+      e.code = 'EMPTY_PAYLOAD';
+      e.detail = `bytes=${res.data?.length ?? 0}${file ? ` dump=${file}` : ''}`;
+      throw e;
+    }
 
     return rawData;
   } catch (err) {
-    const statusCode = err.response?.status;
-    if (statusCode === 404) throw new AppError('Not found', 404);
-    else if (statusCode === 429 || statusCode === 403)
-      throw new AppError(
-        'Quora is rate limiting this instance. Try another or host your own.',
-        503
-      );
-    else throw err;
+    throw upstreamError(err);
   }
 };
 

@@ -39,16 +39,31 @@ const sendErrorResponse = (err, req, res, devMode = false) => {
  * @type {ErrorRequestHandler} 
  */
 const globalErrorHandler = (err, req, res, _next) => {
-  // since not all errors will be an instance of AppError class(as not errors will be manually thrown by us), we have to set sensible defaults before dealing with those errors
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
-  log(err, 'error');
+
+  const isOperational = err.name === 'OperationalError';
+
+  // línea de log con causa y contexto; sin stack para errores esperados
+  log(
+    {
+      message: [
+        err.code ? `[${err.code}]` : '[UNHANDLED]',
+        err.message,
+        err.detail ? `(${err.detail})` : null,
+        `→ ${req.originalUrl}`,
+      ]
+        .filter(Boolean)
+        .join(' '),
+      stack: isOperational ? '' : err.stack,
+    },
+    'error'
+  );
 
   if (env.NODE_ENV === 'development') {
     sendErrorResponse(err, req, res, true);
   } else {
-    // if error is not operational, sending a generic error message and not revealing full details in production mode
-    if (err.name !== 'OperationalError') err.message = 'something went wrong!';
+    if (!isOperational) err.message = 'something went wrong!';
     sendErrorResponse(err, req, res);
   }
 };
