@@ -72,6 +72,13 @@ export const checkCache = cacheKeyFunction =>
     if (!res.locals.stale) {
       const archived = await storeGet(key);
       if (archived) {
+        if (req.query.archived) {
+          // lectura explícita del archivo: se sirve sin consultar a Quora
+          res.locals.data = archived.data;
+          res.locals.fromStale = true;
+          res.locals.staleSince = archived.savedAt;
+          return next();
+        }
         res.locals.stale = archived.data;
         res.locals.staleSince = archived.savedAt;
       }

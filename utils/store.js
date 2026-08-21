@@ -1,8 +1,8 @@
-import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import log from './log.js';
 import env from './env.js';
+import { mkdir, writeFile, readFile, readdir, stat } from 'node:fs/promises';
 
 const DIR = env.STORE_DIR;
 
@@ -37,5 +37,36 @@ export const storeGet = async key => {
     return typeof entry?.savedAt === 'number' ? entry : null;
   } catch {
     return null;
+  }
+};
+
+/** lista lo archivado, agrupado por tipo, ordenado por fecha descendente */
+export const storeList = async () => {
+  if (!DIR) return [];
+  try {
+    const types = await readdir(DIR, { withFileTypes: true });
+    const out = [];
+
+    for (const t of types) {
+      if (!t.isDirectory()) continue;
+      const files = await readdir(path.join(DIR, t.name));
+
+      for (const f of files) {
+        if (!f.endsWith('.json')) continue;
+        const full = path.join(DIR, t.name, f);
+        const { mtimeMs } = await stat(full);
+        out.push({
+          type: t.name,
+          slug: f.replace(/\.json$/, '').split('&lang=')[0],
+          lang: f.match(/&lang=([^.]+)/)?.[1] ?? 'en',
+          savedAt: mtimeMs,
+        });
+      }
+    }
+
+    return out.sort((a, b) => b.savedAt - a.savedAt);
+  } catch (err) {
+    log(`store: no se pudo listar: ${err.message}`);
+    return [];
   }
 };
