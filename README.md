@@ -1,324 +1,214 @@
-# Quetre
+# Quetre (fork)
 
-[![Delightful Humane Tech](https://codeberg.org/teaserbot-labs/delightful-humane-design/raw/branch/main/humane-tech-badge.svg)](https://codeberg.org/teaserbot-labs/delightful-humane-design)
+Fork de [zyachel/quetre](https://github.com/zyachel/quetre), un frontend libre
+para Quora.
 
-Quetre is an alternative front-end to Quora.
-It enables you to see answers without ads, trackers, and other such bloat.
+Upstream lleva sin mantenimiento activo desde 2024 y todas las instancias
+públicas devuelven error. Este fork restaura el funcionamiento del servicio.
 
----
-
-## Key Features
-
-- Privacy focused
-
-  All requests are proxied which makes it impossible for Quora to collate meaningful data points about you.
-
-- No ads or tracking
-
-  Absolutely no ads, no tracking, no browser fingerprinting, and no telemetry of any kind.
-
-- Fully responsive layout
-
-  Utilises modern CSS features like CSS Grid and Flexbox to make the website fully responsive for all screen sizes.
-
-- Lightweight and fast
-
-  As the website contains no bloat, pages load in a jiffy and request sizes are tiny.
-
-- Dark and light themes
-
-  Whether you're a nightowl or bright screen lover, you'll enjoy curated color scheme for your taste.
-
-- Unofficial API support
-
-  just add `/api/v1/` after the domain name in the URL and get a JSON response.
+> Fork de uso personal. No se publican instancias ni se aceptan contribuciones.
+> El código está disponible bajo AGPL-3.0, igual que upstream.
 
 ---
 
-## Screenshots
+## Por qué existe este fork
 
-|                                                                  |                                                                 |
-| :--------------------------------------------------------------: | :-------------------------------------------------------------: |
-| ![website in light mode on desktop](public/misc/img/preview.png) | ![website in dark mode on mobile](public/misc/img/preview2.png) |
+Quora está detrás de Cloudflare y devuelve un **Managed Challenge**
+(`cf-mitigated: challenge`, la página "Just a moment…") a cualquier cliente
+HTTP. Upstream no tiene defensa alguna: envía `User-Agent: axios/x.y`, sin
+cookies, sin proxy y sin control de ritmo.
 
----
+El diagnóstico completo está en los issues #1 y #2. Resumen:
 
-## Instances
+| Cliente | Resultado |
+|---|---|
+| curl estándar, cualquier combinación de cabeceras | challenge |
+| curl con fingerprint TLS de navegador | challenge |
+| Navegador real | 200 |
+| curl estándar + `cf_clearance` | **200** |
 
-| Instance                              | Tor                                                                                  | I2P                                                                         | Region | Provider             | Notes                                                                                                                                                             |
-| ------------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- | ------ | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <https://quetre.iket.me/>             | No                                                                                   | No                                                                          | DE     | Netcup               | Official instance                                                                                                                                                 |
-| <https://qr.vern.cc/>                 | [Yes](http://qr.vernccvbvyi5qhfzyqengccj7lkove6bjot2xhh5kajhwvidqafczrad.onion/)     | [Yes](http://vernnflenvsqccuanaun7yydnmturi4jkyxlyzhn6ultpje66c3q.b32.i2p/) | US     | Hetzner              | Operated by [~vern](https://vern.cc/)                                                                                                                             |
-| <https://quetre.pussthecat.org/>      | No                                                                                   | No                                                                          | DE     | &ndash;              | Operated by [PussTheCat.org](https://pussthecat.org/)                                                                                                             |
-| <https://quetre.tokhmi.xyz/>          | No                                                                                   | No                                                                          | US     | Oracle               | Operated by [Tokhmi](https://tokhmi.xyz/)                                                                                                                         |
-| <https://quetre.privacydev.net/>      | [Yes](http://quetre.g4c3eya4clenolymqbpgwz3q3tawoxw56yhzk4vugqrl6dtu3ejvhjid.onion/) | No                                                                          | FR     | Clovux               | Operated by [PrivacyDev](https://privacydev.net/)                                                                                                                 |
-| <https://ask.habedieeh.re/>           | [Yes](http://ask.habeehrhadazsw3izbrbilqajalfyqqln54mrja3iwpqxgcuxnus7eid.onion/)    | No                                                                          | CA     | Oracle               | Operated by [habedieeh.re](https://www.habedieeh.re/)                                                                                                             |
-| <https://quetre.blackdrgn.nl/>        | No                                                                                   | No                                                                          | DE     | Contabo              | Operated by [blackdrgn.nl](https://blackdrgn.nl/)                                                                                                                 |
-| <https://quetre.lunar.icu/>           | No                                                                                   | No                                                                          | DE     | Cloudflare           | Operated by [lunar.icu](https://lunar.icu/)                                                                                                                       |
-| <https://q.opnxng.com/>               | No                                                                                   | No                                                                          | SG     | Vultr                | Operated by [Opnxng](https://about.opnxng.com/)                                                                                                                   |
-| <https://ask.sudovanilla.org/>        | No                                                                                   | No                                                                          | US     | N/A (Self-hosted)    | Operated by [SudoVanilla](https://sudovanilla.org/)                                                                                                               |
-| <https://quetre.drgns.space/>         | No                                                                                   | No                                                                          | US     | N/A (Self-hosted)    | Operated with ❤️ from [drgns.space](https://drgns.space/)                                                                                                         |
-| <https://quetre.r4fo.com/>            | No                                                                                   | No                                                                          | NL     | Oracle               | Operated by [r4fo](https://r4fo.com/)                                                                                                                             |
-| <https://quetre.ducks.party/>         | No                                                                                   | No                                                                          | NL     | Timeweb              | Operated by [ducks.party](https://ducks.party/)                                                                                                                   |
-| <https://quetre.nadeko.net/>          | [Yes](http://quetre.nadekobxalvyqrhvp3m2atfgdmzp5vcwdmu3wo4htecwjkodancfmgid.onion)  | No                                                                          | CL     | Oracle               | Operated by [Fijxu](https://nadeko.net)                                                                                                                           |
-| <https://quetre.private.coffee/>      | [Yes](http://quetre.coffee2m3bjsrrqqycx6ghkxrnejl2q6nl7pjw2j4clchjj6uk5zozad.onion)  | No                                                                          | AT     | Alwyzon              | Operated by [Private.coffee](https://private.coffee)                                                                                                              |
-| <https://quetre.canine.tools/>        | No                                                                                   | No                                                                          | US     | RoyaleHosting        | Operated by [canine.tools](https://canine.tools/)                                                                                                                 |
-| <https://qt.bloat.cat/>               | No                                                                                   | No                                                                          | DE     | Datalix              | Operated by [bloat.cat](https://bloat.cat/)                                                                                                                       |
-| <https://quetre.jeikobu.net>          | No                                                                                   | No                                                                          | DE     | Hetzner (Cloudflare) | Operated by [Shindou Jeikobu](https://jeikobu.net)                                                                                                                |
-| <https://quetre.franklyflawless.org>  | No                                                                                   | No                                                                          | DE     | Hetzner              | Operated by [FranklyFlawless](https://franklyflawless.org)                                                                                                        |
-| <https://q.307200.xyz/>               | No                                                                                   | No                                                                          | FI     | MicroLXC             | Operated by [dave0003](https://github.com/dave0003)                                                                                                               |
-| <https://quora.nerdvpn.de>            | No                                                                                   | No                                                                          | UA     | Virtual Systems LLC  | Operated by [Weidenwiesel](https://nerdvpn.de/). Uses [Anubis](https://github.com/TecharoHQ/anubis) to protect against AI and Bots. Routed over rotating proxies. |
-| <https://quetre.privacyredirect.com/> | No                                                                                   | No                                                                          | FI     | Private WebHost      | Operated by [privacyredirect](https://privacyredirect.com/)                                                                                                       |
-
-Instances list in JSON format can be found in [instances.json](instances.json) file.
+**Conclusión:** ningún cliente HTTP supera el challenge, porque exige ejecutar
+JavaScript. Pero una vez que un navegador lo resuelve, la `cf_clearance`
+resultante es reutilizable desde cualquier cliente: Cloudflare la ata a
+**IP de salida + User-Agent**, no al fingerprint TLS. Y es válida para todo el
+dominio, no solo para la URL que la generó.
 
 ---
 
-## Comparison
+## Cómo funciona
 
-### Speed
+```
+petición → ¿caché fresca? → sí → servir
+                          → no → cola → axios + cf_clearance
+                                         └─ ¿challenge? → acuñar → reintentar (1 vez)
+                          → si falla y hay copia caducada → servirla
+```
 
-URL for comparison: https://www.quora.com/How-does-the-Z-boson-decay
+Un navegador headless (FlareSolverr) resuelve el challenge **solo cuando la
+clearance falta o caduca**, no en cada petición. El resto del tráfico lo sirve
+un cliente HTTP normal.
 
-|                 | Quora     | Quetre   |
-| --------------- | --------- | -------- |
-| No. of requests | 83\*      | 15       |
-| Load time       | 6.76s     | 4.61s    |
-| Finish time     | 2.44min\* | 4.62s    |
-| Data consumed   | 3.49MB    | 404.47KB |
+En la práctica: ~0,06 s con caché, ~1,4 s contra Quora, ~14 s únicamente
+cuando toca renovar la clearance.
 
-\*the requests were ongoing even after 6 minutes
+### Piezas
 
----
-
-### Usability
-
-- Quora: You can't even see an answer(unless you do some hacks) if you're not signed in. They put a big banner in front of answers to sign you up/in forcefully.
-
-- Quetre: There is no accounts system. Just read whatever you want to read. Zero fuss.
-
----
-
-### Privacy
-
-#### Quora(when browsing anonymously)
-
-From [their privacy policy](https://www.quora.com/about/privacy)
-
-- Technologies used
-  - cookies
-  - log files
-  - clear GIFs/pixel tags
-  - JavaScript
-  - web beacons
-  - local storage objects
-  - Analytics Tools
-  - other tracking technologies
-- Data collected
-  - searches
-  - page views
-  - date and time of your visit
-  - browser type
-  - type of computer or mobile device
-  - browser language
-  - IP address
-  - mobile carrier
-  - unique device identifier
-  - location
-  - requested and referring URLs
-  - other information about your use of the Quora Platform
-
-#### Quetre
-
-- Data actively collected by Quetre
-
-  None.
-
-- Data passively collected by Quetre
-
-  Whenever you hit some error page, an error object is logged to the console on the server. That error object contains the resource url you were trying to access, and the usual stack trace. That's it.
-
-- Data stored locally in your browser
-
-  A key called 'theme' is stored in local storage provided by your browser to store your theme preference should you override the default theme. To prevent this behaviour, either disable JavaScript or local storage for Quetre.
+- **`utils/clearance.js`** — acuña el par `cf_clearance` + User-Agent y lo
+  persiste como unidad indivisible. Comparte la promesa entre peticiones
+  concurrentes para no levantar varios navegadores a la vez.
+- **`utils/axiosInstance.js`** — compone el header `Cookie`, fija el
+  User-Agent acuñado, deriva las Client Hints de él y detecta el challenge en
+  el interceptor de error.
+- **`utils/queue.js`** — serializa las peticiones a Quora con intervalo mínimo
+  y jitter.
+- **`utils/upstreamError.js`** — traduce cada fallo a un código identificable.
+- **`middlewares/middlewares.js`** — caché con frescura y retención separadas.
 
 ---
 
-## FAQs
+## Diferencias con upstream
 
-- How do I use this?
+Este fork parte del **PR upstream #149** (`[WIP]: Cooldown`), nunca mergeado,
+que aportaba cabeceras de navegador, persistencia de cookies y cooldown.
 
-  Replace 'www.quora.com' in any URL with 'quetre.iket.me'(or any other instance). So, 'https://www.quora.com/Are-Nubians-nilotes' becomes 'https://quetre.iket.me/Are-Nubians-nilotes'.
+### Añadido
 
-- I don't want to edit the URLs manually!
+- Acuñación y reutilización de `cf_clearance` vía navegador headless.
+- Cola de peticiones con intervalo mínimo y jitter.
+- Caché con frescura (24 h) y retención (30 d) separadas: las entradas
+  caducadas se conservan y se sirven si Quora falla, en lugar de devolver error.
+- Códigos de error diferenciados y logging con causa y URL.
+- Volcado del HTML recibido cuando Quora responde 200 sin datos.
 
-  There are [a couple of solutions](#automatic-redirection) for that.
+### Corregido
 
-- There are some unreachable routes.
-
-  I'm working to implement them soon. Keep an eye on [To-Do list](#to-do).
-
-- Why are some math equations showing up weirdly?
-
-  If you're browsing with JavaScript disabled, then the Mathjax library isn't able to load and format tex equations. I'd recommend to enable JavaScript for it since there's no other way to show them in the browser. Even Quora uses Mathjax.
-
-- Why can I only view a couple of answers?
-
-  Quora doesn't show all answers at once. It only loads more answers as the user scrolls down. Furthermore, it uses many unique IDs to send ajax requests to fetch those answers. So, all in all, getting more answers isn't impossible but quite difficult requiring some serious amount of time on their website in order to figure out how it all happens. I'm short on time for now.
-
-- Why am I getting a _Recheck the URL_ error?
-
-  Sometimes Quora doesn't populate the answer page HTML, and hence, Quetre is unable to extract data from it. If that happens, you can refresh the page a couple of times to get the answers.
-
-- I have some ideas/want to help.
-
-  You're most welcome to do that. Just [contact me](#contact) or fork [the repo](https://github.com/zyachel/quetre/fork) and make a pull request. You can even help by correcting some typos or translating this README to other languages.
-
-- Why the name Quetre?
-
-  Quora is [supposedly](https://www.quora.com/Why-is-Quora-called-Quora-4) a portmanteau of 'Questions or answers'. In the same vein, Quetre is a portmanteau of 'Questions and answers', but [in Latin](https://lingva.ml/en/la/questions%20and%20answers%0A).
-
-- I cannot view the comments. Will you add that feature?
-
-  See [this issue](https://codeberg.org/zyachel/quetre/issues/11)
-
----
-
-## To-Do
-
-- [x] add missing routes like topics and profile
-- [x] use redis
-- [x] serve images and other assets from Quetre
-- [x] implement a better installation method
-- [ ] implement other trivial routes like a specific answer, spaces, etc.
-- [ ] implement a way to get more answers(not a big priority as of now)
+- **`getBaseUrl(undefined)` devolvía `https://undefined.quora.com`.** Regresión
+  del PR #149: en `main` el valor por defecto era `'www'` y el refactor lo
+  perdió. Se pedía un subdominio inexistente, Cloudflare respondía challenge
+  con clearance o sin ella, y además se disparaba una re-acuñación en cada
+  petición.
+- **El interceptor de rate-limit era código muerto.** Estaba registrado como
+  handler de éxito, pero axios rechaza las respuestas no-2xx, así que nunca
+  veía un 403.
+- **El interceptor sustituía el jar de cookies** en lugar de fusionarlo. Con
+  clearance eso sería letal: cualquier `Set-Cookie` de Quora la eliminaría.
+- **`redis.expire()` recibía el TTL como primer argumento** en vez de la clave.
+  El refresco de TTL en acierto de caché no funcionaba en ningún caso.
+- **`checkCache` no fijaba `fromCache`**, por lo que se reescribía la entrada
+  en cada acierto.
+- **Cabeceras incoherentes:** `Content-Encoding` en vez de `Accept-Encoding`,
+  `zstd` anunciado sin poder descomprimirlo, `Sec-Fetch-Site: cross-site` en
+  navegaciones directas.
+- **El Dockerfile clonaba el repositorio upstream** en lugar de usar el código
+  local: construir desde el fork introducía el código de upstream en la imagen
+  y los cambios propios se ignoraban en silencio.
 
 ---
 
-## Installation
+## Decisiones descartadas
 
-### Manual
+Documentadas para no repetir el camino.
 
-1. Install [Node.js](https://nodejs.org/en/), [Git](https://git-scm.com/), and [Redis](https://redis.io)(Optional). Instructions are on their websites.
+**Cambiar la IP de salida (VPN, proxies rotatorios).** Descartado tras
+verificar que un navegador desde la misma IP carga Quora con normalidad: la IP
+está limpia y el bloqueo es por fingerprint de cliente. Cloudflare puntúa
+reputación de red, y las IPs de datacenter tienen peor score que una
+residencial: introducirlas empeoraría el problema.
 
-2. Clone and set up the repository.
+**Clientes HTTP con fingerprint de navegador.** Probado, recibe challenge
+igualmente. Un fingerprint mejor solo evitaría que Cloudflare *emita* el reto;
+una vez emitido, exige JavaScript.
 
-   ```bash
-   git clone https://github.com/zyachel/quetre.git # replace github.com with codeberg.org if you're cloning from there
-   cd quetre
-   cp .env.example .env # you can make any changes here
-   # change `pnpm` to `npm run` here as well as in package.json if you use `npm`
-   pnpm install
-   pnpm start
-   # optional
-   redis-server # useful for caching api responses
-   ```
+**Navegador headless como fetcher principal.** Funciona, pero cuesta ~20 s por
+petición frente a ~1,4 s. Se conserva únicamente como acuñador.
 
-Quetre will start running at http://localhost:3000.
+**Rotación de User-Agent.** Rotar el UA manteniendo la misma sesión es más
+sospechoso que un UA fijo. Además la clearance está ligada al UA que la emitió.
 
-### Docker
-
-There is a [docker image](https://github.com/PussTheCat-org/docker-quetre-quay) made by [@TheFrenchGhosty](https://github.com/TheFrenchGhosty) for [PussTheCat.org](https://pussthecat.org/)'s [instance](https://quetre.pussthecat.org/).
-If you want a leaner one, you can checkout [@video-prize-ranch](https://codeberg.org/video-prize-ranch)'s [docker image](https://codeberg.org/video-prize-ranch/-/packages/container/quetre/latest).
-
----
-
-## Contributing
-
-The development may seem slow as I don't have lots of free time. And whenever I do, it gets split between this service and [libremdb](https://github.com/zyachel/libremdb/).
-If you believe you can help furthering this project in any way(be it maintaining, fixing issues, or adding features), please [get in touch](#contact).
-Regardless, any type of contribution is always welcome.
-
-## Misc
-
-### Automatic redirection
-
-Following extensions can be used to automatically redirect Quora URLs to Quetre:
-
-- [redirector](https://github.com/einaregilsson/Redirector)
-  You can manually add any redirect.
-  Below is a basic config of Quora to Quetre. Replace `quetre.iket.me` in `Redirect to` to any instance of your choice.
-
-  ```
-  Description: Quora to Quetre
-  Example URL: https://www.quora.com/What-is-Linux-4?share=1
-  Include pattern: (https:\/\/.{2,}\.quora\.com\/.*)
-  Redirect to: https://quetre.iket.me/redirect/$1
-  Pattern type: Regular Expression
-  Pattern description: redirects all Quora urls to Quetre
-  ```
-
-  This config should output:
-  `Example result: https://quetre.iket.me/redirect/https://www.quora.com/What-is-Linux-4?share=1`
-
-- [LibRedirect](https://github.com/libredirect/libredirect/)
-  Redirects many popular services to their alternative front-ends. Has a ton of features and an active community. Quetre is supported by default. So, no need to do anything.
-
-- [Privacy Redirector](https://github.com/dybdeskarphet/privacy-redirector)
-  A userscript that redirects popular social media platforms to their privacy respecting frontends.
-
-- Other addons with similar functionality:
-
-  - [Dynamic Privacy Redirect](https://github.com/PrivacyDevel/DPR-addon)
-  - [Alter](https://github.com/w3bdev1/alter)
-
-  - [Predirect](https://github.com/libreom/predirect), A modern, manifest v3 based extension that requires minimal permissions(even for embeds).
-
-See [Predirect's Comparison table](https://github.com/libreom/predirect/blob/main/COMPARISON.md) for more.
-
-### Other alternative front-ends
-
-- [digitalblossom/alternative-frontends](https://github.com/digitalblossom/alternative-frontends): contains other alternative front-ends.
-- [mendel5/alternative-front-ends](https://github.com/mendel5/alternative-front-ends): a bit more general, containing alternative clients too.
+**Cola dentro del cliente HTTP.** El proxy de imágenes comparte instancia pero
+apunta al CDN: serializarlo haría que cada página tardase una eternidad.
+Además, el reintento tras re-acuñar vuelve a pasar por el interceptor, por lo
+que una cola ahí se auto-bloquearía. La cola vive en los fetchers.
 
 ---
 
-## Credits
+## Configuración
 
-### Programming
+Además de las variables de upstream:
 
-- [JavaScript](https://www.ecma-international.org/technical-committees/tc39/): programming language
-- [Sass](https://sass-lang.com/): CSS preprocessor
-- [Pug](https://pugjs.org/): Template engine
-- [Node.js](https://nodejs.org/en/): JS runtime environment
-- [Express](http://expressjs.com/): Application framework for Node.js
+| Variable | Por defecto | Descripción |
+|---|---|---|
+| `FLARESOLVERR_URL` | — | URL del servicio que acuña la clearance. Sin ella el servicio no puede renovar el acceso. |
+| `FLARESOLVERR_TIMEOUT` | `120000` | Timeout de acuñación (ms). |
+| `MIN_REQUEST_INTERVAL` | `2000` | Separación mínima entre peticiones a Quora (ms), ±40% de jitter. `0` desactiva la cola. |
+| `REDIS_TTL` | `86400` | Frescura de la caché (s). |
+| `REDIS_HARD_TTL` | `2592000` | Retención real en Redis (s). Las entradas caducadas se conservan para servirlas si Quora falla. |
 
-### Resources
-
-- [Inkscape](https://inkscape.org/): Vector graphics editor. Made Quetre logo and favicons
-- [Material Design Icons](https://materialdesignicons.com/): SVGs
-- [Font Awesome](https://fontawesome.com/): SVGs
-
-### Code hosting
-
-- [GitHub](https://github.com/). Quetre source code: [github.com/zyachel/quetre](https://github.com/zyachel/quetre)
-- [Codeberg](https://codeberg.org/). Quetre source code: [codeberg.org/zyachel/quetre](https://codeberg.org/zyachel/quetre)
-
-### Inspiration
-
-- [Teddit](https://codeberg.org/teddit/teddit)
-- [Nitter](https://github.com/zedeus/nitter)
-
-### Others
-
-- Contributors
-- Instance maintainers
-- Users :)
+Redis pasa de opcional a **necesario en la práctica**: sin él la clearance no
+persiste entre reinicios y cada arranque exige acuñar de nuevo.
 
 ---
 
-## Contact
+## Operación
 
-Send a message on [\[matrix\]](https://matrix.to/#/@ninal:matrix.org) or go old school with [email](mailto:aricla@protonmail.com) in case you wish to contact me.
+### Códigos de error
+
+Aparecen en el log como `[CÓDIGO] mensaje (detalle) → url`.
+
+| Código | Significado |
+|---|---|
+| `NOT_FOUND` | La página no existe en Quora. |
+| `RATE_LIMITED` | Quora está limitando (429). Activa cooldown. |
+| `CHALLENGE_UNSOLVED` | Falló la acuñación. **Revisar el servicio acuñador.** |
+| `EMPTY_PAYLOAD` | 200 sin datos: Quora cambió el marcado. Genera un volcado. |
+| `UPSTREAM_ERROR` | Quora devuelve 5xx. |
+| `NETWORK` | No se pudo contactar. |
+| `INTERNAL` | Error de programación. Conserva traza. |
+
+### Purgar la caché
+
+La clearance vive en la misma base de Redis que la caché. **No usar
+`FLUSHDB`**: borraría la clearance y forzaría una acuñación.
+
+```
+redis-cli --scan --pattern 'cache:*' | xargs -r redis-cli del
+```
+
+### Cuándo caduca la clearance
+
+El atributo de la cookie indica un año, pero Cloudflare puede invalidarla
+antes. El caso más frecuente es un **cambio de IP pública de salida**: la
+clearance muere en el acto. La detección de challenge y la re-acuñación
+automática son las que hacen que el servicio se recupere solo.
+
+### Volcados
+
+`EMPTY_PAYLOAD` guarda el HTML recibido en `dumps/`, rotando los 10 últimos.
+Es la única evidencia disponible si Quora cambia el marcado.
 
 ---
 
-## License
+## Limitaciones heredadas
 
-Licensed under [GNU AGPLv3](./LICENSE).
+- **Búsqueda:** eliminada en upstream (`f49062d`), devuelve `410`.
+- **Rutas `/space/`:** nunca implementadas, devuelven `501`.
+- **Respuestas:** solo se muestran las primeras. Quora las carga
+  incrementalmente y la paginación no está implementada.
+- **Quora Plus:** el contenido de pago no es accesible.
 
 ---
 
-## Disclaimer
+## Compilación
 
-_Quetre does not host any content. All content is from Quora. Quora is a tradmark of Quora Inc._
+El lockfile es `lockfileVersion 6.0`, que requiere **pnpm 8**. Versiones
+posteriores lo rechazan; regenerarlo con `--force` perdería la reproducibilidad
+de las dependencias que upstream probó.
+
+Sass se compila en tiempo de build. El arranque invoca `node server.js`
+directamente, no `pnpm start`, que recompilaba el CSS en cada arranque.
+
+---
+
+## Licencia
+
+AGPL-3.0-or-later, igual que upstream.
