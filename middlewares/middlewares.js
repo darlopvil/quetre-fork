@@ -49,7 +49,7 @@ export const checkCache = cacheKeyFunction =>
     const data = await redis.get(key);
 
     if (data) {
-      await redis.expire(env.REDIS_TTL, ttl, 'GT');
+      await redis.expire(key, ttl, 'GT');
       res.locals.data = JSON.parse(data);
     }
 
