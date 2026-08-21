@@ -3,6 +3,7 @@ import axiosInstance, { getBaseUrl } from '../utils/axiosInstance.js';
 import AppError from '../utils/AppError.js';
 import parse from '../utils/parse.js';
 import upstreamError from '../utils/upstreamError.js';
+import enqueue from '../utils/queue.js';
 
 /**
  * @param {string} resourceStr a string after the baseURL
@@ -10,7 +11,9 @@ import upstreamError from '../utils/upstreamError.js';
  */
 const answersFetcher = async (resourceStr, lang) => {
   try {
-    const res = await axiosInstance.get(encodeURIComponent(resourceStr), { baseURL: getBaseUrl(lang) });
+    const res = await enqueue(() =>
+      axiosInstance.get(encodeURIComponent(resourceStr), { baseURL: getBaseUrl(lang) })
+    );
     const $ = cheerio.load(res.data);
 
     const rawData = { question: null, answers: [], related: [], answerCount: 0 };

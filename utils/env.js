@@ -12,6 +12,7 @@ const env = {
   ACCEPT_ENCODING: process.env.ACCEPT_ENCODING || 'gzip, deflate, br',
   NO_UPGRADE: process.env.NO_UPGRADE || false,
   CACHE_PERIOD: process.env.CACHE_PERIOD || '1y',
+  MIN_REQUEST_INTERVAL: Number(process.env.MIN_REQUEST_INTERVAL) || 2000,
   REDIS_URL: process.env.REDIS_URL,
   REDIS_TTL: Number(process.env.REDIS_TTL) || 86400,
   REDIS_HARD_TTL: Number(process.env.REDIS_HARD_TTL) || 2592000,
