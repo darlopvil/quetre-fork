@@ -3,7 +3,7 @@ node_modules/*
 .env
 dev-data/*
 public/css/*
-dump.rdbdocker-compose.yml
-dumps/dumps/
-store/
+dump.rdb
+docker-compose.yml
+dumps/
 store/
