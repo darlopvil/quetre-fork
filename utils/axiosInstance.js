@@ -7,11 +7,11 @@ const axiosInstance = axios.create({
   headers: {
     'User-Agent': env.USER_AGENT,
     Accept: env.ACCEPT,
-    'Content-Encoding': env.ACCEPT_ENCODING,
+    'Accept-Encoding': env.ACCEPT_ENCODING,
     'Upgrade-Insecure-Requests': 1,
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-Site': 'cross-site',
+    'Sec-Fetch-Site': 'none',
     Priority: 'u=0, i',
     TE: 'trailers',
   },
