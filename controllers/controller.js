@@ -8,7 +8,7 @@ export const answers = catchAsyncErrors(async (req, res, next) => {
   const { params: { slug }, query: { lang } } = req;
 
   /** @type{Awaited<ReturnType<typeof getAnswers>>} */
-  let data = res.locals.data;
+  const data = await resolve(res, () => getAnswers(slug, lang));
   if (!data) data = await getAnswers(slug, lang);
 
   const title = data.question.text[0].spans.map(span => span.text).join('');
@@ -24,7 +24,7 @@ export const topic = catchAsyncErrors(async (req, res, next) => {
   const { params: { slug }, query: { lang } } = req;
 
   /** @type{Awaited<ReturnType<typeof getTopic>>} */
-  let data = res.locals.data;
+  const data = await resolve(res, () => getTopic(slug, lang));
   if (!data) data = await getTopic(slug, lang);
 
   res.locals.data = data;
@@ -38,7 +38,7 @@ export const profile = catchAsyncErrors(async (req, res, next) => {
   const { params: { name }, query: { lang } } = req;
 
   /** @type{Awaited<ReturnType<typeof getProfile>>} */
-  let data = res.locals.data;
+  const data = await resolve(res, () => getProfile(name, lang));
   if (!data) data = await getProfile(name, lang);
 
   res.locals.data = data;
@@ -66,4 +66,16 @@ export const redirect = (req, res, _next) => {
   else link = `/space/${subdomain}${rest}`; // gotta be a space url.
 
   return res.redirect(link);
+};
+
+/** devuelve datos frescos, o la copia caducada si upstream falla */
+const resolve = async (res, fetcher) => {
+  if (res.locals.data) return res.locals.data;
+  try {
+    return await fetcher();
+  } catch (err) {
+    if (!res.locals.stale) throw err;
+    res.locals.fromStale = true;
+    return res.locals.stale;
+  }
 };

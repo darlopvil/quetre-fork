@@ -7,7 +7,7 @@ export const answersKey = urlObj => {
   const slug = formatSlug(urlObj.pathname, '/');
   const lang = getLang(urlObj);
 
-  return `answers:${slug}&lang=${lang}`;
+  return `cache:answers:${slug}&lang=${lang}`;
 };
 
 /** @param {URL} urlObj */
@@ -15,7 +15,7 @@ export const topicKey = urlObj => {
   const slug = formatSlug(urlObj.pathname, '/topic/');
   const lang = getLang(urlObj);
 
-  return `topic:${slug}&lang=${lang}`;
+  return `cache:topic:${slug}&lang=${lang}`;
 };
 
 /** @param {URL} urlObj */
@@ -23,5 +23,5 @@ export const profileKey = urlObj => {
   const slug = formatSlug(urlObj.pathname, '/profile/');
   const lang = getLang(urlObj);
 
-  return `profile:${slug}&lang=${lang}`;
+  return `cache:profile:${slug}&lang=${lang}`;
 };

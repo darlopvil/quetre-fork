@@ -13,7 +13,8 @@ const env = {
   NO_UPGRADE: process.env.NO_UPGRADE || false,
   CACHE_PERIOD: process.env.CACHE_PERIOD || '1y',
   REDIS_URL: process.env.REDIS_URL,
-  REDIS_TTL: process.env.REDIS_TTL || 3600,
+  REDIS_TTL: Number(process.env.REDIS_TTL) || 86400,
+  REDIS_HARD_TTL: Number(process.env.REDIS_HARD_TTL) || 2592000,
   RATE_LIMIT_COOLDOWN: Number.isNaN(+process.env.RATE_LIMIT_COOLDOWN)
     ? 7_200_000
     : Number(process.env.RATE_LIMIT_COOLDOWN),

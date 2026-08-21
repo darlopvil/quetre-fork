@@ -2,7 +2,7 @@ import { getValidQueryParams } from '../utils/urlModifiers.js';
 import AppError from '../utils/AppError.js';
 import { requestsState } from '../utils/state.js';
 import catchAsyncErrors from '../utils/catchAsyncErrors.js';
-import redis, { ttl } from '../utils/redis.js';
+import redis, { ttl, hardTtl } from '../utils/redis.js';
 import env from '../utils/env.js';
 
 
@@ -13,14 +13,19 @@ export const formatReq = (req, _res, next) => {
   next();
 };
 
-/** @type {import("express").RequestHandler} */
 export const checkRateLimit = (_req, res, next) => {
-  if (res.locals.data) return next(); // cached data present.
+  if (res.locals.data) return next();
   if (!requestsState.retryAfter) return next();
 
-  // time limit over. trying again.
   if (requestsState.retryAfter <= Date.now()) {
     requestsState.retryAfter = null;
+    return next();
+  }
+
+  // en cooldown: copia caducada antes que error
+  if (res.locals.stale) {
+    res.locals.data = res.locals.stale;
+    res.locals.fromStale = true;
     return next();
   }
 
@@ -28,29 +33,36 @@ export const checkRateLimit = (_req, res, next) => {
 };
 
 export const setCache = catchAsyncErrors(async (_req, res, next) => {
-  if (res.locals.fromCache) return next();
+  if (res.locals.fromCache || res.locals.fromStale) return next();
 
-  const data = res.locals.data;
-  const cacheKey = res.locals.cacheKey;
-
-  await redis.set(cacheKey, JSON.stringify(data), 'EX', ttl);
+  const entry = { data: res.locals.data, freshUntil: Date.now() + ttl * 1000 };
+  await redis.set(res.locals.cacheKey, JSON.stringify(entry), 'EX', hardTtl);
   next();
 });
 
-/**
- * sets cached response in `res.locals.data` if any
- * @param {(urlObj: URL) => string} cacheKeyFunction to retrieve cache key.
- */
 export const checkCache = cacheKeyFunction =>
   catchAsyncErrors(async (req, res, next) => {
     const key = cacheKeyFunction(req.urlObj);
     res.locals.cacheKey = key;
 
-    const data = await redis.get(key);
+    const raw = await redis.get(key);
+    if (!raw) return next();
 
-    if (data) {
-      await redis.expire(key, ttl, 'GT');
-      res.locals.data = JSON.parse(data);
+    let entry;
+    try {
+      entry = JSON.parse(raw);
+    } catch {
+      return next();
+    }
+    if (typeof entry?.freshUntil !== 'number') return next();
+
+    if (entry.freshUntil > Date.now()) {
+      res.locals.data = entry.data;
+      res.locals.fromCache = true;
+      await redis.expire(key, hardTtl, 'GT');
+    } else {
+      res.locals.stale = entry.data;
+      res.locals.staleSince = entry.freshUntil;
     }
 
     next();
