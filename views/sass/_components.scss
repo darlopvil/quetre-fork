@@ -536,3 +536,21 @@
     gap: var(--space-800);
   }
 }
+
+////////////////////////////////////////////////////////
+//                  ARCHIVED NOTICE
+////////////////////////////////////////////////////////
+.archived-notice {
+  max-width: 80rem;
+  margin: var(--space-200) auto 0;
+  padding: var(--space-100) var(--space-200);
+  border-inline-start: 4px solid var(--clr-base-link);
+  background-color: var(--clr-base-bg);
+  color: var(--clr-base-text-alt-alpha);
+  font-size: var(--fs-140);
+
+  & time {
+    color: var(--clr-base-heading);
+    font-weight: 600;
+  }
+}

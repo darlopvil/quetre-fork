@@ -42,6 +42,11 @@ html(lang='en')
     -if (meta.title !=='About')
       a.skip-link(href="#main") Skip to main content
 
+    if meta.archivedAt
+      p.archived-notice(role='status')
+        | Copia guardada del #[time(datetime=meta.archivedAt.toISOString())= meta.archivedAt.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })].
+        |  Quora no está disponible ahora mismo.
+
     //- MAIN CONTENT GOES HERE
     include layout/_header
     block content 

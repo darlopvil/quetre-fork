@@ -4,7 +4,14 @@
  */
 export const render = name => (req, res, _next) => {
   const urlObj = req.urlObj;
-  const { title, imageUrl = `${urlObj.origin}/icon.svg`, description, data } = res.locals;
+  const {
+    title,
+    imageUrl = `${urlObj.origin}/icon.svg`,
+    description,
+    data,
+    fromStale,
+    staleSince,
+  } = res.locals;
 
   res.locals = {};
   res.status(200).render(name, {
@@ -14,6 +21,7 @@ export const render = name => (req, res, _next) => {
       title,
       imageUrl,
       description,
+      ...(fromStale && staleSince && { archivedAt: new Date(staleSince) }),
     },
   });
 };
