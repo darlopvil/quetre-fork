@@ -1,6 +1,7 @@
 import AppError from '../utils/AppError.js';
 import { quetrefy } from '../utils/urlModifiers.js';
 import fetcher from './fetcher.js';
+import log from '../utils/log.js';
 
 // clean specific types of feed
 const feedAnswerCleaner = answer => ({
@@ -40,9 +41,9 @@ const feedPostCleaner = post => ({
   pid: post.pid,
   isViewable: post.viewerHasAccess,
   url: quetrefy(post.url),
-  title: JSON.parse(post.title).sections,
+  title: post.title ? JSON.parse(post.title).sections : null,
   isDeleted: post.isDeleted,
-  text: JSON.parse(post.content).sections,
+  text: post.content ? JSON.parse(post.content).sections : [],
   creationTime: post.creationTime,
   updatedTime: post.updatedTime,
   numComments: post.numDisplayComments,
@@ -85,11 +86,14 @@ const feedQuestionCleaner = question => ({
 // takes feed from getProfile and passes them onto above helpers for cleansing.
 const feedCleaner = feed => {
   const cleanFeed = feed.map(feedItem => {
-    if (feedItem.node.answer) return feedAnswerCleaner(feedItem.node.answer);
-    if (feedItem.node.question)
-      return feedQuestionCleaner(feedItem.node.question);
-    if (feedItem.node.post) return feedPostCleaner(feedItem.node.post);
-
+    try {
+      if (feedItem.node.answer) return feedAnswerCleaner(feedItem.node.answer);
+      if (feedItem.node.question) return feedQuestionCleaner(feedItem.node.question);
+      if (feedItem.node.post) return feedPostCleaner(feedItem.node.post);
+    } catch (err) {
+      // un elemento defectuoso no debe tumbar el perfil entero
+      log(`feed: elemento descartado (${feedItem.node.__typename}): ${err.message}`);
+    }
     return [];
   });
 

@@ -32,7 +32,7 @@ mixin addPost(post)
         p.metadata-primary__misc(aria-label=`${post.author.name}'s credentials`)= post.author.credential || ''
 
     //- POST HEADING
-    if post.title[0].spans[0].text
+    if post.title && post.title[0] && post.title[0].spans && post.title[0].spans[0] && post.title[0].spans[0].text
       .answer__question.heading.heading__tertiary
         +formatText(post.title)
 
