@@ -34,6 +34,9 @@ const getAnswers = async (slug, lang) => {
       qid: answer.question.qid,
       isDeleted: answer.question.isDeleted,
     },
+    // quora inserta en el feed respuestas a preguntas relacionadas: hay que
+    // poder distinguirlas de las que responden a la pregunta actual
+    answersThisQuestion: answer.question.qid === rawData.question.qid,
   }));
 
   // main data object to be returned

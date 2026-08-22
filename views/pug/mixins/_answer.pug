@@ -30,9 +30,10 @@ mixin addAnswer(answer, includeQuestion=false)
         span Answered to&nbsp;
         a.answer__link.answers__link(href=answer.question.url)
           +spansChecker(answer.question.text[0].spans)
-    else if answer.originalQuestion
-      p.answer__question.heading.heading__tertiary
-        span Originally answered to&nbsp;
+    else if answer.originalQuestion && !answer.answersThisQuestion
+      p.answer__question.answer__question--related.heading.heading__tertiary
+        svg.icon.answer__question-icon(aria-hidden='true'): use(href='/misc/sprite.svg#icon-danger')
+        span Respuesta a otra pregunta:&nbsp;
         a.answer__link.answers__link(href=answer.originalQuestion.url)
           +spansChecker(answer.originalQuestion.text[0].spans)
 

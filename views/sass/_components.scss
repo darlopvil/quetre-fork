@@ -554,3 +554,22 @@
     font-weight: 600;
   }
 }
+
+////////////////////////////////////////////////////////
+//              RELATED-QUESTION BADGE
+////////////////////////////////////////////////////////
+.answer__question--related {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-050);
+  padding: var(--space-050) var(--space-100);
+  border-inline-start: 3px solid var(--clr-base-link);
+  background-color: var(--clr-base-bg);
+  color: var(--clr-base-text-alt-alpha);
+
+  & .answer__question-icon {
+    flex-shrink: 0;
+    align-self: center;
+    fill: var(--clr-base-icon-alt-alpha);
+  }
+}
