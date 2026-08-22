@@ -157,6 +157,8 @@ Además de las variables de upstream:
 | `REDIS_HARD_TTL` | `2592000` | Retención real en Redis (s). Las entradas caducadas se conservan para servirlas si Quora falla. |
 | `STORE_DIR` | `/app/store` | Directorio del archivo permanente. Cadena vacía lo desactiva. |
 | `QUORA_BASE_URL` | `https://www.quora.com` | Origen. Solo se cambia para pruebas, p. ej. apuntando a un host inalcanzable para verificar el rescate desde disco. |
+| `QUORA_SESSION_COOKIES` | — | Cookies de sesión (`m-b=...; m-s=...`) para la búsqueda. Sin ellas, `/search` devuelve `SEARCH_NEEDS_SESSION`. El resto del servicio no las usa. |
+| `SEARCH_QUERY_HASH` | (valor actual) | Hash de la consulta persistida de búsqueda. Cambia cuando Quora recompila su frontend. |
 
 Redis pasa de opcional a **necesario en la práctica**: sin él la clearance no
 persiste entre reinicios y cada arranque exige acuñar de nuevo.
@@ -195,6 +197,43 @@ debería costar peticiones a un sitio que ya bloqueó la instancia una vez.
 
 Respaldar el archivo es copiar el directorio. No hay base de datos ni formato
 propietario.
+
+---
+
+## Búsqueda
+
+Upstream eliminó la búsqueda en 2024 (`f49062d`) porque Quora dejó de servirla
+a usuarios anónimos. Sigue siendo cierto, y hoy hay además una segunda barrera.
+
+**Por qué no se puede scrapear.** La ruta `/search` recibe challenge de
+Cloudflare incluso con una clearance válida que en el mismo momento sirve otras
+rutas con 200: la regla cubre un conjunto de rutas. Y aunque se supere con un
+navegador real, el HTML no contiene resultados — cero marcadores del parser, 3
+blobs frente a los ~10 de una pregunta normal. Es una cáscara que rellena el
+JavaScript.
+
+**Cómo funciona aquí.** La búsqueda va por el endpoint GraphQL de Quora
+(`/graphql/gql_para_POST`) con consulta persistida. Requiere tres cosas:
+
+1. El **hash** de la operación `SearchResultsListQuery`. Quora sirve cada
+   consulta como artefacto propio en su CDN, así que puede extraerse sin
+   desmenuzar bundles.
+2. La cabecera **`quora-formkey`**, extraíble del HTML de cualquier página. Es
+   estable mientras dure la sesión, así que se obtiene una vez y se reutiliza.
+3. **Cookies de sesión.** Sin ellas la consulta responde 200 pero con
+   `searchConnection` nulo: Quora devuelve cero resultados a los anónimos.
+
+**La sesión se usa únicamente para la búsqueda.** El resto del servicio sigue
+siendo anónimo. Aun así, conviene emplear una cuenta desechable: las búsquedas
+quedan asociadas a ella.
+
+**Filtros.** Tipo (`question`, `answer`, `post`, `profile`, `topic`, `tribe`) y
+tiempo (`year`, `month`, `week`, `day`, `hour`) funcionan. El filtro de idioma
+se eliminó de la interfaz: la consulta no tiene variable para ello.
+
+**Cuando deje de funcionar.** Si Quora recompila su frontend, el hash cambia y
+hay que actualizar `SEARCH_QUERY_HASH`. Si caducan las cookies, el error será
+`SEARCH_NEEDS_SESSION`.
 
 ---
 

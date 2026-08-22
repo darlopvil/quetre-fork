@@ -1,9 +1,9 @@
 import express from 'express';
 import { about, privacy, unimplemented, gone, archive, search } from '../controllers/viewController.js';
-import { answers, topic, profile, redirect } from '../controllers/controller.js';
-import { answersKey, profileKey, topicKey, searchKey } from '../utils/cacheKeys.js';
 import { checkCache, checkRateLimit, setCache } from '../middlewares/middlewares.js';
 import { render } from '../middlewares/viewMiddlewares.js';
+import { answers, topic, profile, redirect, published } from '../controllers/controller.js';
+import { answersKey, profileKey, topicKey, searchKey, publishedKey } from '../utils/cacheKeys.js';
 
 const viewRouter = express.Router();
 
@@ -18,6 +18,14 @@ viewRouter.get(
 viewRouter.get('/(|about)', about);
 viewRouter.get('/privacy', privacy);
 viewRouter.get('/archive', archive);
+viewRouter.get(
+  '/profile/:name/answers/published',
+  checkCache(publishedKey),
+  checkRateLimit,
+  published,
+  setCache,
+  render('published'),
+);
 viewRouter.get(
   '/profile/:name',
   checkCache(profileKey),

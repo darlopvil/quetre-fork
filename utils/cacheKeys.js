@@ -35,3 +35,11 @@ export const searchKey = urlObj => {
 
   return `cache:search:${q}&type=${type}&time=${time}&after=${after}`;
 };
+
+/** @param {URL} urlObj */
+export const publishedKey = urlObj => {
+  const slug = urlObj.pathname.replace('/profile/', '').replace('/answers/published', '').toLowerCase();
+  const lang = getLang(urlObj);
+
+  return `cache:published:${slug}&lang=${lang}`;
+};

@@ -3,6 +3,19 @@ import { acceptedLanguages } from '../utils/constants.js';
 import getAnswers from '../fetchers/getAnswers.js';
 import getTopic from '../fetchers/getTopic.js';
 import getProfile from '../fetchers/getProfile.js';
+import getPublished from '../fetchers/getPublished.js';
+
+export const published = catchAsyncErrors(async (req, res, next) => {
+  const { params: { name }, query: { lang } } = req;
+
+  const data = await resolve(res, () => getPublished(name, lang));
+
+  res.locals.data = data;
+  res.locals.title = `Respuestas publicadas de ${data.name}`;
+  res.locals.description = `Respuestas de ${data.name} publicadas en otros medios.`;
+
+  next();
+});
 
 export const answers = catchAsyncErrors(async (req, res, next) => {
   const { params: { slug }, query: { lang } } = req;

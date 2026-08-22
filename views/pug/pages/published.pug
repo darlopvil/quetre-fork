@@ -1,0 +1,18 @@
+extends ../base
+include ../mixins/_formatText
+include ../mixins/_utils
+include ../mixins/_answer
+include ../mixins/_metadata
+
+block content
+  main#main.main.answers
+    section.answers-box
+      h1.heading.heading__primary Respuestas publicadas de #[a.link(href=data.profileUrl)= data.name]
+      p.metadata-secondary
+        span #{data.answers.length} de #{data.numPublished}
+      if !data.answers.length
+        p Este perfil no tiene respuestas publicadas.
+      else
+        .answers-box__list
+          each answer in data.answers
+            +addAnswer(answer, true)
