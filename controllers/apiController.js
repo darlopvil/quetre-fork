@@ -1,11 +1,13 @@
 import axiosInstance from '../utils/axiosInstance.js';
 import catchAsyncErrors from '../utils/catchAsyncErrors.js';
+import AppError from '../utils/AppError.js';
+import getSearch from '../fetchers/getSearch.js';
 
 /** @type {import('express').RequestHandler} */
 export const about = (_req, res, _next) => {
   res.status(200).json({
     status: 'success',
-    message: `make a request. available endpoints are: '/slug', '/unanswered/slug', '/topic/slug', '/profile/slug'`,
+    message: `make a request. available endpoints are: '/slug', '/unanswered/slug', '/topic/slug', '/profile/slug', '/search?q='`,
   });
 };
 
@@ -25,6 +27,17 @@ export const gone = (_req, res, _next) => {
   });
 };
 
+export const search = catchAsyncErrors(async (req, res, next) => {
+  const { q, after, type } = req.query;
+
+  if (!q) throw new AppError('Falta el parámetro de búsqueda `q`.', 400);
+
+  let data = res.locals.data;
+  if (!data) data = await getSearch(q, { after, type });
+
+  res.locals.data = data;
+  next();
+});
 
 /** @type {import('express').RequestHandler} */
 export const image = catchAsyncErrors(async (req, res, _next) => {

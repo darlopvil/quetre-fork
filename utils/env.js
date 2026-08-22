@@ -22,6 +22,10 @@ const env = {
     ? 7_200_000
     : Number(process.env.RATE_LIMIT_COOLDOWN),
   STORE_DIR: process.env.STORE_DIR ?? '/app/store',
+  QUORA_SESSION_COOKIES: process.env.QUORA_SESSION_COOKIES || '',
+  SEARCH_QUERY_HASH:
+    process.env.SEARCH_QUERY_HASH ||
+    'deb8d8c3f230ef7568c0895df972ada793afb470ecd151e07453f7b7c0e51134',
 };
 
 export default env;

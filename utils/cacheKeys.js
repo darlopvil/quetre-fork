@@ -25,3 +25,12 @@ export const profileKey = urlObj => {
 
   return `cache:profile:${slug}&lang=${lang}`;
 };
+
+/** @param {URL} urlObj */
+export const searchKey = urlObj => {
+  const q = (urlObj.searchParams.get('q') || '').toLowerCase();
+  const after = urlObj.searchParams.get('after') || '';
+  const type = urlObj.searchParams.get('type') || 'all_types';
+
+  return `cache:search:${q}&type=${type}&after=${after}`;
+};

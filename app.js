@@ -9,7 +9,8 @@ import globalErrorHandler from './controllers/errorController.js';
 import AppError from './utils/AppError.js';
 import { formatReq } from './middlewares/middlewares.js';
 import env from './utils/env.js';
-
+import { loadSession } from './utils/graphql.js';
+loadSession();
 const app = express();
 
 app.use(compression());
