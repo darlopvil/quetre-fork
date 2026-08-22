@@ -8,5 +8,5 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "rules": { "spaced-comment": 0, "import/extensions": 0 }
+  "rules": { "spaced-comment": 0, "import/extensions": 0,"no-duplicate-imports": "error" }
 }

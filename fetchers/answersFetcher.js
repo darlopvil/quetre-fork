@@ -4,10 +4,11 @@ import AppError from '../utils/AppError.js';
 import parse from '../utils/parse.js';
 import upstreamError from '../utils/upstreamError.js';
 import enqueue from '../utils/queue.js';
+import dumpBody from '../utils/dumpBody.js';
 
 /**
  * @param {string} resourceStr a string after the baseURL
- * @param {string} lang 
+ * @param {string} lang
  */
 const answersFetcher = async (resourceStr, lang) => {
   try {

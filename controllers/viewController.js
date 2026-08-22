@@ -1,3 +1,6 @@
+import catchAsyncErrors from '../utils/catchAsyncErrors.js';
+import { storeList } from '../utils/store.js';
+
 /** @type {import("express").RequestHandler} */
 export const about = (req, res, _next) => {
   res.render('about', {
@@ -22,6 +25,20 @@ export const privacy = (req, res, _next) => {
     },
   });
 };
+
+export const archive = catchAsyncErrors(async (req, res, _next) => {
+  const entries = await storeList();
+
+  res.status(200).render('archive', {
+    data: { entries },
+    meta: {
+      title: 'Archive',
+      url: req.urlObj,
+      imageUrl: `${req.urlObj.origin}/icon.svg`,
+      description: 'Contenido guardado localmente.',
+    },
+  });
+});
 
 /** @type {import("express").RequestHandler} */
 export const unimplemented = (req, res, _next) => {

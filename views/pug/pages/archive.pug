@@ -1,0 +1,16 @@
+extends ../base
+
+block content
+  main#main.main
+    h1.heading.heading__primary Archivo local
+
+    if !data.entries.length
+      p Todavía no hay nada archivado.
+    else
+      p #{data.entries.length} páginas guardadas.
+      ul
+        each e in data.entries
+          li
+            a(href=`/${e.type === 'answers' ? '' : e.type + '/'}${e.slug}?archived=1&lang=${e.lang}`)= e.slug
+            |  ·
+            time(datetime=new Date(e.savedAt).toISOString())= new Date(e.savedAt).toLocaleDateString('es-ES')

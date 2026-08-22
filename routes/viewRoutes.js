@@ -1,5 +1,5 @@
 import express from 'express';
-import { about, privacy, unimplemented, gone } from '../controllers/viewController.js';
+import { about, privacy, unimplemented, gone, archive } from '../controllers/viewController.js';
 import { answers, topic, profile, redirect } from '../controllers/controller.js';
 import { answersKey, profileKey, topicKey } from '../utils/cacheKeys.js';
 import { checkCache, checkRateLimit, setCache } from '../middlewares/middlewares.js';
@@ -10,6 +10,7 @@ const viewRouter = express.Router();
 viewRouter.get('/search', gone);
 viewRouter.get('/(|about)', about);
 viewRouter.get('/privacy', privacy);
+viewRouter.get('/archive', archive);
 viewRouter.get(
   '/profile/:name',
   checkCache(profileKey),
