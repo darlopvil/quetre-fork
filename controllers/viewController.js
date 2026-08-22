@@ -7,7 +7,7 @@ export const search = catchAsyncErrors(async (req, res, next) => {
 
   if (!q) {
     return res.status(200).render('search', {
-      data: { results: [], query: '' },
+      data: { searchData: null, searchText: '' },
       meta: {
         title: 'Búsqueda',
         url: req.urlObj,
@@ -20,7 +20,12 @@ export const search = catchAsyncErrors(async (req, res, next) => {
   let data = res.locals.data;
   if (!data) data = await getSearch(q, { after, type });
 
-  res.locals.data = { ...data, query: q };
+  // res.locals.data guarda SIEMPRE la forma canonica: es lo que va a la cache
+  // y lo que comparte con la API. La plantilla espera otra forma, asi que se
+  // adapta en el render y no antes, o el formato dependeria de quien llegue
+  // primero a la clave compartida.
+  res.locals.data = data;
+  res.locals.viewData = { searchData: data, searchText: q };
   res.locals.title = `Búsqueda: ${q}`;
   res.locals.description = `Resultados de búsqueda para ${q}.`;
 
