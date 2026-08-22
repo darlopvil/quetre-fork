@@ -18,7 +18,6 @@ block content
     - 
       const typesArr = [{key: 'question', text: 'Questions'}, {key: 'answer', text: 'Answers'}, {key: 'post', text: 'Posts'}, {key: 'profile', text: 'Profiles'}, {key: 'topic', text: 'Topics'}, {key: 'tribe', text: 'Spaces'}]
       const timesArr = [{key: 'hour', text: 'Hour'}, {key: 'day', text: 'Day'}, {key: 'week', text: 'Week'}, {key: 'month', text: 'Month'}, {key: 'year', text: 'Year'}] 
-      const languagesArr = ['en','es','fr','de','it','jp','id','pt','hi','nl','da','fi','nb','sv','mr','bn','ta','ar','he','gu','kn','ml','te','po'];
 
     form.search__form.search-form(action="/search", method='get', autocomplete='off', name='search')
       .search-form__search-container
@@ -38,13 +37,6 @@ block content
           .search-form__filters-group
             input.search-form__radio.visually-hidden(type="radio", name='time', value=item.key, id=`time--${item.key}`) 
             label.search-form__label(for=`time--${item.key}`)= item.text
-
-      .search-form__filters-container.search-form__filters-container--lang
-        p.search-form__filters-heading Filter by Language
-        each lang in languagesArr
-          .search-form__filters-group
-            input.search-form__radio.visually-hidden(type="radio", name='lang', value=lang, id=`lang--${lang}`) 
-            label.search-form__label(for=`lang--${lang}`)= lang.toUpperCase()
 
     //- TODO: refactor 'profile', 'topic', and 'space' into resusable mixins.
     - if (data.searchData?.results)

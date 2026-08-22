@@ -5,6 +5,7 @@ import AppError from '../utils/AppError.js';
 import { gql } from '../utils/graphql.js';
 import env from '../utils/env.js';
 import { quetrefy } from '../utils/urlModifiers.js';
+import log from '../utils/log.js';
 
 ////////////////////////////////////////////////////////
 //                  HELPER FUNCTIONS
@@ -88,10 +89,10 @@ const postCleaner = post => ({
   pid: post.pid,
   isViewable: post.viewerHasAccess,
   url: quetrefy(post.url),
-  title: JSON.parse(post.title).sections,
+  title: post.title ? JSON.parse(post.title).sections : null,
   isDeleted: post.isDeleted,
   isSensitive: post.isSensitive,
-  text: JSON.parse(post.content).sections,
+  text: post.content ? JSON.parse(post.content).sections : [],
   creationTime: post.creationTime,
   updatedTime: post.updatedTime,
   numComments: post.numDisplayComments,
@@ -121,20 +122,25 @@ const postCleaner = post => ({
 });
 
 const resultsCleaner = results => {
-  const cleanedResults = results.map(result => {
+  const cleanedResults = (results || []).map(result => {
     const resultToClean = result.node;
 
-    if (resultToClean.topic) return topicCleaner(resultToClean.topic);
-    if (resultToClean.tribe) return spaceCleaner(resultToClean.tribe);
-    if (resultToClean.post) return postCleaner(resultToClean.post);
-    if (resultToClean.user) return profileCleaner(resultToClean.user);
-    if (resultToClean.previewAnswer) return answerCleaner(resultToClean);
-    if (resultToClean.question) return questionCleaner(resultToClean.question);
+    try {
+      if (resultToClean.topic) return topicCleaner(resultToClean.topic);
+      if (resultToClean.tribe) return spaceCleaner(resultToClean.tribe);
+      if (resultToClean.post) return postCleaner(resultToClean.post);
+      if (resultToClean.user) return profileCleaner(resultToClean.user);
+      if (resultToClean.previewAnswer) return answerCleaner(resultToClean);
+      if (resultToClean.question) return questionCleaner(resultToClean.question);
+    } catch (err) {
+      // un resultado defectuoso no debe tumbar la busqueda entera
+      log(`search: resultado descartado (${resultToClean.searchResultType}): ${err.message}`);
+    }
 
     return {};
   });
 
-  return cleanedResults;
+  return cleanedResults.filter(r => r.type);
 };
 
 ////////////////////////////////////////////////////////
@@ -146,7 +152,7 @@ const resultsCleaner = results => {
  * Quora los sirve solo por GraphQL a sesiones autenticadas. requiere
  * QUORA_SESSION_COOKIES configurado.
  */
-const getSearch = async (query, { after = null, type = 'all_types' } = {}) => {
+const getSearch = async (query, { after = null, type = 'all_types', time = 'all_times' } = {}) => {
   const res = await gql('SearchResultsListQuery', env.SEARCH_QUERY_HASH, {
     after,
     author: null,
@@ -156,7 +162,7 @@ const getSearch = async (query, { after = null, type = 'all_types' } = {}) => {
     resultType: type,
     sortOrder: 'relevance',
     tid: null,
-    time: 'all_times',
+    time,
     tribeId: null,
   });
 

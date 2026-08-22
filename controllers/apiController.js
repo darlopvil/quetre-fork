@@ -28,12 +28,12 @@ export const gone = (_req, res, _next) => {
 };
 
 export const search = catchAsyncErrors(async (req, res, next) => {
-  const { q, after, type } = req.query;
+  const { q, after, type, time } = req.query;
 
   if (!q) throw new AppError('Falta el parámetro de búsqueda `q`.', 400);
 
   let data = res.locals.data;
-  if (!data) data = await getSearch(q, { after, type });
+  if (!data) data = await getSearch(q, { after, type, time });
 
   res.locals.data = data;
   next();

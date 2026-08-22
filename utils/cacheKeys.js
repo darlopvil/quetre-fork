@@ -31,6 +31,7 @@ export const searchKey = urlObj => {
   const q = (urlObj.searchParams.get('q') || '').toLowerCase();
   const after = urlObj.searchParams.get('after') || '';
   const type = urlObj.searchParams.get('type') || 'all_types';
+  const time = urlObj.searchParams.get('time') || 'all_times';
 
-  return `cache:search:${q}&type=${type}&after=${after}`;
+  return `cache:search:${q}&type=${type}&time=${time}&after=${after}`;
 };

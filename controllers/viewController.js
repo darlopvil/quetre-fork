@@ -3,7 +3,7 @@ import { storeList } from '../utils/store.js';
 import getSearch from '../fetchers/getSearch.js';
 
 export const search = catchAsyncErrors(async (req, res, next) => {
-  const { q, after, type } = req.query;
+  const { q, after, type, time } = req.query;
 
   if (!q) {
     return res.status(200).render('search', {
@@ -18,7 +18,7 @@ export const search = catchAsyncErrors(async (req, res, next) => {
   }
 
   let data = res.locals.data;
-  if (!data) data = await getSearch(q, { after, type });
+  if (!data) data = await getSearch(q, { after, type, time });
 
   // res.locals.data guarda SIEMPRE la forma canonica: es lo que va a la cache
   // y lo que comparte con la API. La plantilla espera otra forma, asi que se
