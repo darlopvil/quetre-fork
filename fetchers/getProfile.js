@@ -140,7 +140,7 @@ const getProfile = async (slug, lang) => {
       numAnswerViews: rawData.allTimePublicContentViews,
       numLastMonthAnswerViews: rawData.lastMonthPublicContentViews,
       topWriterYears: rawData.topWriterYears.join(', '),
-      PublishedWriterIn: rawData.publishers
+      publishedWriterIn: rawData.publishers
         .map(obj => obj.publisherName)
         .join(', '),
       publishedAnswersUrl: rawData.publishedUrl,
