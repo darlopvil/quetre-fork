@@ -1,5 +1,6 @@
 import { quetrefy } from '../utils/urlModifiers.js';
 import answersFetcher from './answersFetcher.js';
+import log from '../utils/log.js';
 
 const getAnswers = async (slug, lang) => {
   // getting data and destructuring it in case it exists
@@ -62,6 +63,20 @@ const getAnswers = async (slug, lang) => {
       text: JSON.parse(questionObj.title).sections,
     })),
   };
+
+  // los tipos no reconocidos caen en la rama generica de la plantilla, que solo
+  // renderiza spans: si el contenido no vive ahi, se pierde sin dejar rastro.
+  // se registran para poder implementarlos con datos en lugar de por conjetura.
+  const KNOWN_TYPES = new Set([
+    'plain', 'code', 'image', 'horizontal-rule', 'yt-embed', 'tweet',
+    'unordered-list', 'ordered-list',
+  ]);
+  const unknown = [
+    ...new Set(
+      ansArr.flatMap(a => a.text.map(p => p.type)).filter(t => t && !KNOWN_TYPES.has(t))
+    ),
+  ];
+  if (unknown.length) log(`tipos de seccion no reconocidos en ${slug}: ${unknown.join(', ')}`);
 
   return data;
 };
