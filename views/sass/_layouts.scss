@@ -81,7 +81,8 @@
     gap: var(--space-200);
   }
 
-  &__theme {
+  &__theme,
+  &__search {
     height: var(--fs-300);
     width: var(--fs-300);
 
@@ -89,6 +90,12 @@
       height: var(--fs-250);
       width: var(--fs-250);
     }
+  }
+
+  // search icon viewBox is larger than content, hence the fix
+  &__search > svg {
+    height: 105%;
+    width: 105%;
   }
 
   &__info {

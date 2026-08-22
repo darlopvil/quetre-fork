@@ -1,5 +1,31 @@
 import catchAsyncErrors from '../utils/catchAsyncErrors.js';
 import { storeList } from '../utils/store.js';
+import getSearch from '../fetchers/getSearch.js';
+
+export const search = catchAsyncErrors(async (req, res, next) => {
+  const { q, after, type } = req.query;
+
+  if (!q) {
+    return res.status(200).render('search', {
+      data: { results: [], query: '' },
+      meta: {
+        title: 'Búsqueda',
+        url: req.urlObj,
+        imageUrl: `${req.urlObj.origin}/icon.svg`,
+        description: 'Buscar en Quora.',
+      },
+    });
+  }
+
+  let data = res.locals.data;
+  if (!data) data = await getSearch(q, { after, type });
+
+  res.locals.data = { ...data, query: q };
+  res.locals.title = `Búsqueda: ${q}`;
+  res.locals.description = `Resultados de búsqueda para ${q}.`;
+
+  return next();
+});
 
 /** @type {import("express").RequestHandler} */
 export const about = (req, res, _next) => {
