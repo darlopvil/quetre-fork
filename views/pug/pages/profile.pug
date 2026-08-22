@@ -88,7 +88,9 @@ block content
             li.profile-highlights__item
               svg.icon.metadata-primary__icon.profile-stats__icon
                 use(href='/misc/sprite.svg#icon-pen')
-              span Published Writer in #{data.highlights.publishedWriterIn}
+              span
+                | Published Writer in #{data.highlights.publishedWriterIn}.&nbsp;
+                a.link(href=`${data.basic.profile}/answers/published`) Ver respuestas publicadas
           - if(data.highlights.topAskerYears)  
             li.profile-highlights__item
               svg.icon.metadata-primary__icon.profile-stats__icon
