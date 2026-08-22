@@ -7,10 +7,21 @@ import env from './env.js';
 const buildClientHints = ua => {
   const major = ua.match(/Chrome\/(\d+)/)?.[1];
   if (!major) return {};
+
+  const platform = /Windows/.test(ua)
+    ? 'Windows'
+    : /Macintosh|Mac OS X/.test(ua)
+      ? 'macOS'
+      : /Android/.test(ua)
+        ? 'Android'
+        : /Linux/.test(ua)
+          ? 'Linux'
+          : 'Unknown';
+
   return {
     'sec-ch-ua': `"Chromium";v="${major}", "Not(A:Brand";v="24", "Google Chrome";v="${major}"`,
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"Linux"',
+    'sec-ch-ua-mobile': /Mobile|Android/.test(ua) ? '?1' : '?0',
+    'sec-ch-ua-platform': `"${platform}"`,
   };
 };
 
@@ -20,7 +31,7 @@ const axiosInstance = axios.create({
     'User-Agent': env.USER_AGENT,
     Accept: env.ACCEPT,
     'Accept-Encoding': env.ACCEPT_ENCODING,
-    'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+    'Accept-Language': env.ACCEPT_LANGUAGE,
     'Upgrade-Insecure-Requests': 1,
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
