@@ -38,15 +38,24 @@ dominio, no solo para la URL que la generó.
 ## Cómo funciona
 
 ```
-petición → ¿caché fresca? → sí → servir
-                          → no → cola → axios + cf_clearance
-                                         └─ ¿challenge? → acuñar → reintentar (1 vez)
-                          → si falla y hay copia caducada → servirla
+petición → ¿caché fresca en Redis?  → sí → servir
+         → ¿?archived=1 y hay copia? → sí → servir del disco
+         → no → cola → axios + cf_clearance
+                        └─ ¿challenge? → acuñar → reintentar (1 vez)
+         → si falla → copia caducada de Redis, o del archivo en disco
 ```
 
 Un navegador headless (FlareSolverr) resuelve el challenge **solo cuando la
 clearance falta o caduca**, no en cada petición. El resto del tráfico lo sirve
 un cliente HTTP normal.
+
+Tres capas de almacenamiento, con propósitos distintos:
+
+| | Qué es | Retiene |
+|---|---|---|
+| **Redis** | Caché en memoria | 24 h fresco · 30 d como copia de rescate |
+| **Disco** | Archivo permanente | Todo lo visitado, sin caducidad |
+| **Quora** | Origen | — |
 
 En la práctica: ~0,06 s con caché, ~1,4 s contra Quora, ~14 s únicamente
 cuando toca renovar la clearance.
@@ -63,6 +72,9 @@ cuando toca renovar la clearance.
   y jitter.
 - **`utils/upstreamError.js`** — traduce cada fallo a un código identificable.
 - **`middlewares/middlewares.js`** — caché con frescura y retención separadas.
+- **`utils/store.js`** — archivo permanente en disco: un JSON por página, en
+  subcarpeta por tipo. Nunca lanza: si el disco falla, la aplicación sigue
+  sirviendo desde Redis.
 
 ---
 
@@ -143,9 +155,46 @@ Además de las variables de upstream:
 | `MIN_REQUEST_INTERVAL` | `2000` | Separación mínima entre peticiones a Quora (ms), ±40% de jitter. `0` desactiva la cola. |
 | `REDIS_TTL` | `86400` | Frescura de la caché (s). |
 | `REDIS_HARD_TTL` | `2592000` | Retención real en Redis (s). Las entradas caducadas se conservan para servirlas si Quora falla. |
+| `STORE_DIR` | `/app/store` | Directorio del archivo permanente. Cadena vacía lo desactiva. |
+| `QUORA_BASE_URL` | `https://www.quora.com` | Origen. Solo se cambia para pruebas, p. ej. apuntando a un host inalcanzable para verificar el rescate desde disco. |
 
 Redis pasa de opcional a **necesario en la práctica**: sin él la clearance no
 persiste entre reinicios y cada arranque exige acuñar de nuevo.
+
+---
+
+## Archivo permanente
+
+Toda página obtenida con éxito se guarda en disco de forma indefinida, como
+objeto ya parseado y no como HTML crudo: ocupa menos y es inmune a cambios
+futuros del marcado.
+
+```
+store/
+├── answers/what-is-linux-4&lang=en.json
+├── topic/physics&lang=en.json
+└── profile/charlie-cheever&lang=en.json
+```
+
+Cada fichero guarda `savedAt`, de modo que al servir una copia el lector ve de
+qué fecha es. Responde a la objeción de upstream (issue #99) sobre servir
+respuestas rancias: el contenido antiguo se sirve, pero se dice.
+
+**Rescate automático.** Si Quora falla y Redis no tiene copia, se sirve la del
+archivo con un aviso de procedencia. Verificado apuntando `QUORA_BASE_URL` a un
+host inalcanzable con Redis vacío: la página sale igual.
+
+**`?archived=1`** fuerza la lectura del disco sin consultar a Quora. Es una
+preferencia, no una prohibición: si la página no está archivada, el flujo
+continúa a Quora con normalidad. Devolver un 404 haría creer al lector que la
+instancia está bloqueada.
+
+**`/archive`** lista lo guardado, ordenado por fecha descendente. Los enlaces
+del índice llevan `?archived=1` incorporado: navegar el propio archivo no
+debería costar peticiones a un sitio que ya bloqueó la instancia una vez.
+
+Respaldar el archivo es copiar el directorio. No hay base de datos ni formato
+propietario.
 
 ---
 
