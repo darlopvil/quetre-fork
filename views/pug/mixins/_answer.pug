@@ -22,7 +22,7 @@ mixin addAnswer(answer, includeQuestion=false)
             title verified
             use(href='/misc/sprite.svg#icon-verified')
       +proxifyImg(answer.author.image)(class='metadata-primary__image', alt='', aria-hidden='true')
-      p.metadata-primary__misc(aria-label=`${answer.author.name}'s credentials`)= answer.author.credential || ''
+      p.metadata-primary__misc(aria-label=`Credenciales de ${answer.author.name}`)= answer.author.credential || ''
 
     //- ORIGINAL QUESTION
     if includeQuestion

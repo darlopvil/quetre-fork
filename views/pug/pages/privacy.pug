@@ -8,26 +8,26 @@ extends ../base
 //-//////////////////////////////////////////////////////
 block content 
   main#main.main.privacy 
-    h1.heading.heading__primary.privacy__heading-primary Privacy Policy
+    h1.heading.heading__primary.privacy__heading-primary Política de privacidad
 
     //- ONE LINER
     section.privacy__short
-      h2.heading.heading__secondary.privacy__heading-secondary The short version
-      p.privacy__short-text Quetre doesn't collect any personally identifiable data.
+      h2.heading.heading__secondary.privacy__heading-secondary La versión corta
+      p.privacy__short-text Quetre no recoge ningún dato que permita identificarte.
 
     //- EXPLAINER
     section.faqs.privacy__long
-      h2.heading.heading__secondary.privacy__heading-secondary The long version
+      h2.heading.heading__secondary.privacy__heading-secondary La versión larga
       .faqs__list
         details.faqs__faq
-          summary.faqs__question Data actively collected by Quetre
+          summary.faqs__question Datos que Quetre recoge activamente
             svg.faqs__icon: use(href='/misc/sprite.svg#icon-open')
-          p.faqs__answer None.
+          p.faqs__answer Ninguno.
         details.faqs__faq
-          summary.faqs__question Data passively collected by Quetre
+          summary.faqs__question Datos que Quetre recoge de forma pasiva
             svg.faqs__icon: use(href='/misc/sprite.svg#icon-open')
-          p.faqs__answer Whenever you hit some error page, an error object is logged to the console on the server. That error object contains the resource url you were trying to access, and the usual stack trace. That's it.
+          p.faqs__answer Cada vez que llegas a una página de error, se registra un objeto de error en la consola del servidor. Ese objeto contiene la URL del recurso al que intentabas acceder y la traza de la pila habitual. Nada más.
         details.faqs__faq
-          summary.faqs__question Data stored locally in your browser
+          summary.faqs__question Datos guardados localmente en tu navegador
             svg.faqs__icon: use(href='/misc/sprite.svg#icon-open')
-          p.faqs__answer A key called 'theme' is stored in local storage provided by your browser to store your theme preference should you override the default theme. To prevent this behaviour, either disable JavaScript or local storage for Quetre.
+          p.faqs__answer Se guarda una clave llamada «theme» en el almacenamiento local de tu navegador para recordar tu preferencia de tema, si es que cambias el que viene por defecto. Para evitarlo, desactiva JavaScript o el almacenamiento local para Quetre.

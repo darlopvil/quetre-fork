@@ -6,25 +6,18 @@ extends ../base
 //-//////////////////////////////////////////////////////
 //-                SECONDARY CONTENT
 //-//////////////////////////////////////////////////////
-//- this block adds nav bar to header
 block header__nav
-  nav.header__nav-box(aria-label='Table of Contents'): ul.header__nav 
+  nav.header__nav-box(aria-label='Índice de contenidos'): ul.header__nav 
     li.header__nav-item
-      a.header__link.header__nav-link(href="#features") Features
+      a.header__link.header__nav-link(href="#features") Mejoras
     li.header__nav-item
-      a.header__link.header__nav-link(href="#faqs") FAQs
-    li.header__nav-item
-      a.header__link.header__nav-link(href="#contact") Contact
-    li.header__nav-item
-      a.header__link.header__nav-link(href="https://github.com/darlopvil/quetre-fork") Source
+      a.header__link.header__nav-link(href="https://github.com/darlopvil/quetre-fork") Código fuente
 
-//- this block makes header span full viewport and adds a one-liner hero text
 block header__info
   .header__info 
-    h1.heading.heading__primary.header__hero A libre front-end for Quora
-    a.header__link.header__down(href='#features', aria-label='go to features section'): svg.icon.icon__down: use(href='/misc/sprite.svg#icon-down')
+    h1.heading.heading__primary.header__hero Un frontend libre para Quora
+    a.header__link.header__down(href='#features', aria-label='Ir a la sección de mejoras'): svg.icon.icon__down: use(href='/misc/sprite.svg#icon-down')
 
-//- this block changes the footer a bit
 block prepend footer
   p.footer__logo Quetre
 
@@ -33,89 +26,53 @@ block prepend footer
 //-//////////////////////////////////////////////////////
 block content 
   main#main.main.about
-    //- FEATURES
+    //- AVISO
+    section.about__contact
+      h2.heading.heading__secondary.about__heading-secondary Fork personal
+      p.about__contact-text Esto es un fork de uso estrictamente privado. No está pensado para terceros, no se ofrece como servicio y no se aceptan contribuciones. El código está publicado únicamente como respaldo y para cumplir la licencia:&nbsp;
+        a.about__link(href='https://github.com/darlopvil/quetre-fork') github.com/darlopvil/quetre-fork
+        |.
+
+    //- MEJORAS
     section.about__features.features#features
-      h2.heading.heading__secondary.about__heading-secondary.features__heading Key features
+      h2.heading.heading__secondary.about__heading-secondary.features__heading Mejoras sobre el proyecto original
       .features__list 
         .features__feature 
           svg.features__feature-icon: use(href='/misc/sprite.svg#icon-spy')
-          h3.heading.heading__tertiary.features__feature-heading Privacy focused
-          p.features__feature-text All requests are proxied which makes it impossible for Quora to collate meaningful data points about you.
+          h3.heading.heading__tertiary.features__feature-heading Acceso restaurado
+          p.features__feature-text El proyecto original dejó de funcionar cuando Quora empezó a exigir un reto anti-bot. Aquí el reto se resuelve con un navegador sin interfaz únicamente cuando caduca el permiso, y el resto de peticiones las sirve un cliente HTTP normal.
         .features__feature 
-          svg.features__feature-icon: use(href='/misc/sprite.svg#icon-fingerprint')
-          h3.heading.heading__tertiary.features__feature-heading No ads or tracking
-          p.features__feature-text Absolutely no ads, no tracking, no browser fingerprinting, and no telemetry of any kind.
+          svg.features__feature-icon: use(href='/misc/sprite.svg#icon-search')
+          h3.heading.heading__tertiary.features__feature-heading Búsqueda recuperada
+          p.features__feature-text El proyecto original la eliminó en 2024. Aquí funciona a través de la API interna de Quora, con filtros por tipo y por fecha.
         .features__feature 
-          svg.features__feature-icon: use(href='/misc/sprite.svg#icon-responsive')
-          h3.heading.heading__tertiary.features__feature-heading Fully responsive layout
-          p.features__feature-text Utilises modern CSS features like CSS Grid and Flexbox to make the website fully responsive for all screen sizes.
+          svg.features__feature-icon: use(href='/misc/sprite.svg#icon-clock')
+          h3.heading.heading__tertiary.features__feature-heading Archivo permanente
+          p.features__feature-text Todo lo consultado se guarda en disco de forma indefinida. Si Quora deja de responder, el contenido se sigue sirviendo indicando la fecha de la copia.
         .features__feature 
           svg.features__feature-icon: use(href='/misc/sprite.svg#icon-bolt')
-          h3.heading.heading__tertiary.features__feature-heading Lightweight and fast
-          p.features__feature-text As the website contains no bloat, pages load in a jiffy and request sizes are tiny.
+          h3.heading.heading__tertiary.features__feature-heading Caché con rescate
+          p.features__feature-text Dos niveles de caché con frescura y retención separadas. Una copia caducada es preferible a un error.
+        .features__feature 
+          svg.features__feature-icon: use(href='/misc/sprite.svg#icon-danger')
+          h3.heading.heading__tertiary.features__feature-heading Errores diagnosticables
+          p.features__feature-text Cada fallo se registra con su causa concreta en lugar de agrupar todo bajo el mismo mensaje genérico.
+        .features__feature 
+          svg.features__feature-icon: use(href='/misc/sprite.svg#icon-pen')
+          h3.heading.heading__tertiary.features__feature-heading Respuestas publicadas
+          p.features__feature-text Nueva vista con las respuestas que un autor ha publicado en otros medios, accesible desde su perfil.
+        .features__feature 
+          svg.features__feature-icon: use(href='/misc/sprite.svg#icon-question')
+          h3.heading.heading__tertiary.features__feature-heading Respuestas ajenas señaladas
+          p.features__feature-text Quora mezcla en el hilo respuestas que en realidad son a otras preguntas. Aquí quedan marcadas para no confundirlas.
         .features__feature 
           svg.features__feature-icon: use(href='/misc/sprite.svg#icon-palette')
-          h3.heading.heading__tertiary.features__feature-heading Dark and light themes
-          p.features__feature-text Whether you're a nightowl or bright screen lover, you'll enjoy curated color scheme for your taste.
-        .features__feature 
-          svg.features__feature-icon: use(href='/misc/sprite.svg#icon-code')
-          h3.heading.heading__tertiary.features__feature-heading Unofficial API support
-          p.features__feature-text just add&nbsp;
-            code /api/v1/
-            |&nbsp;after the domain name in the URL and get a JSON repsonse.
+          h3.heading.heading__tertiary.features__feature-heading Interfaz en español
+          p.features__feature-text Toda la interfaz traducida, incluidos los textos de accesibilidad.
 
-    //- FAQs
-    section.about__faqs.faqs#faqs
-      h2.heading.heading__secondary.about__heading-secondary.faqs__heading FAQs
-      .faqs__list
-        details.faqs__faq
-          summary.faqs__question How do I use this?
-            svg.faqs__icon: use(href='/misc/sprite.svg#icon-open')
-          p.faqs__answer Replace 'www.quora.com' in any URL with 'quetre.iket.me'. So,&nbsp;
-            a.about__link(href='https://www.quora.com/Are-Nubians-nilotes') www.quora.com/Are-Nubians-nilotes
-            |&nbsp;becomes&nbsp;
-            a.about__link(href='https://quetre.iket.me/Are-Nubians-nilotes') quetre.iket.me/Are-Nubians-nilotes
-            |.
-        details.faqs__faq
-          summary.faqs__question I don't want to edit the URLs manually!
-            svg.faqs__icon: use(href='/misc/sprite.svg#icon-open')
-          p.faqs__answer You can use&nbsp;
-            a.about__link(href='https://github.com/zyachel/quetre#automatic-redirection') automatic redirectors
-            |&nbsp;for that.
-        details.faqs__faq
-          summary.faqs__question There are some unreachable routes.
-            svg.faqs__icon: use(href='/misc/sprite.svg#icon-open')
-          p.faqs__answer I'm working to implement them soon.
-        details.faqs__faq
-          summary.faqs__question Why are some math equations showing up weirdly?
-            svg.faqs__icon: use(href='/misc/sprite.svg#icon-open')
-          p.faqs__answer If you're browsing with JavaScript disabled, then the Mathjax library isn't able to load and format tex equations. I'd recommend to enable JavaScript for it since there's no other way to show them in the browser. Even Quora uses Mathjax.
-        details.faqs__faq
-          summary.faqs__question Why can I only view a couple of answers?
-            svg.faqs__icon: use(href='/misc/sprite.svg#icon-open')
-          p.faqs__answer Quora doesn't show all answers at once. It only loads more answers as the user scrolls down. Furthermore, it uses many unique IDs to send ajax requests to fetch those answers. So, all in all, getting more answers isn't impossible but quite difficult requiring some serious amount of time on their website in order to figure out how it all happens. I'm short on time for now.
-        details.faqs__faq
-          summary.faqs__question I have some ideas/want to help.
-            svg.faqs__icon: use(href='/misc/sprite.svg#icon-open')
-          p.faqs__answer You're most welcome to do that. Just&nbsp;
-            a.about__link(href='#contact') contact me
-            |&nbsp;or fork&nbsp;
-            a.about__link(href='https://github.com/darlopvil/quetre-fork') the repo
-            |&nbsp;and make a pull request.
-        details.faqs__faq
-          summary.faqs__question Why the name Quetre?
-            svg.faqs__icon: use(href='/misc/sprite.svg#icon-open')
-          p.faqs__answer Quora is&nbsp;
-            a.about__link(href='/Why-is-Quora-called-Quora-4') supposedly
-            |&nbsp;a portmanteau of 'Questions or answers'. In the same vein, Quetre is a portmanteau of 'Questions and answers', but&nbsp;
-            a.about__link(href="https://lingva.ml/en/la/questions%20and%20answers%0A") in Latin
-            |.
-
-    //- CONTACT INFO
+    //- ORIGEN
     section.about__contact#contact
-      h2.heading.heading__secondary.about__heading-secondary.about__contact-heading Contact
-      address.about__contact-text Reach me via&nbsp;
-        a.about__link(href='https://matrix.to/#/@ninal:matrix.org') Matrix
-        |&nbsp;or&nbsp;
-        a.about__link(href="mailto:aricla@protonmail.com") Email
-        |&nbsp;in case you got any suggestions or feedback, or if you just want to drop a hi :)
+      h2.heading.heading__secondary.about__heading-secondary Origen
+      p.about__contact-text Versión modificada de&nbsp;
+        a.about__link(href='https://github.com/zyachel/quetre') Quetre
+        |, creado por zyachel y publicado bajo licencia AGPL-3.0.

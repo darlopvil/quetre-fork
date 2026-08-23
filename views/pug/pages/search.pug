@@ -22,8 +22,8 @@ block content
     form.search__form.search-form(action="/search", method='get', autocomplete='off', name='search')
       .search-form__search-container
         input.search-form__searchbar(type="search", name="q", placeholder='Escribe tu búsqueda...', minlength='3', aria-label='busca lo que quieras')
-        button.search-form__button.search-form__button--reset(type="reset", aria-label='clear searchbar and filters'): svg.icon: use(href='/misc/sprite.svg#icon-cross')
-        button.search-form__button.search-form__button--submit(type="submit", aria-label='search'): svg.icon: use(href='/misc/sprite.svg#icon-search')
+        button.search-form__button.search-form__button--reset(type="reset", aria-label='Limpiar la búsqueda y los filtros'): svg.icon: use(href='/misc/sprite.svg#icon-cross')
+        button.search-form__button.search-form__button--submit(type="submit", aria-label='Buscar'): svg.icon: use(href='/misc/sprite.svg#icon-search')
       .search-form__filters-container.search-form__filters-container--type
         p.search-form__filters-heading Filtrar por tipo
         each item in typesArr
@@ -58,7 +58,7 @@ block content
                   .metadata-primary
                     p.metadata-primary__heading
                       if item.isAnon
-                        span Anonymous
+                        span Anónimo
                       else
                         a.link.metadata-primary__link(href=item.url)= item.name
                       if item.isVerified
@@ -66,7 +66,7 @@ block content
                           title verified
                           use(href='/misc/sprite.svg#icon-verified')
                     +proxifyImg(item.image)(class='metadata-primary__image', alt='', aria-hidden='true')
-                    p.metadata-primary__misc(aria-label=`${item.name}'s credentials`)= item.credential || ''
+                    p.metadata-primary__misc(aria-label=`Credenciales de ${item.name}`)= item.credential || ''
                 - else if (item.type === 'topic')
                   .metadata-primary
                     a.link.metadata-primary__heading(href=item.url)= item.name

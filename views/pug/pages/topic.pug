@@ -37,7 +37,7 @@ block content
                     title verified
                     use(href='/misc/sprite.svg#icon-verified')
               +proxifyImg(author.image)(class='metadata-primary__image', alt='', aria-hidden='true')
-              p.metadata-primary__misc(aria-label=`${author.name}'s credentials`)= author.credential || ''
+              p.metadata-primary__misc(aria-label=`Credenciales de ${author.name}`)= author.credential || ''
             .metadata-secondary
               +addMetadataSecondary('user', 'Seguidores', author.numFollowers)
               +addMetadataSecondary('eye', 'Vistas', author.numViews)

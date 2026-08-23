@@ -29,7 +29,7 @@ mixin addPost(post)
               title verified
               use(href='/misc/sprite.svg#icon-verified')
         +proxifyImg(post.author.image)(class='metadata-primary__image', alt='', aria-hidden='true')
-        p.metadata-primary__misc(aria-label=`${post.author.name}'s credentials`)= post.author.credential || ''
+        p.metadata-primary__misc(aria-label=`Credenciales de ${post.author.name}`)= post.author.credential || ''
 
     //- POST HEADING
     if post.title && post.title[0] && post.title[0].spans && post.title[0].spans[0] && post.title[0].spans[0].text

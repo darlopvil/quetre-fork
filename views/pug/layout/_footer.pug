@@ -1,7 +1,7 @@
 //-//////////////////////////////////////////////////////
 //-                   MAIN CONTENT
 //-//////////////////////////////////////////////////////
-footer.footer(class=`${meta.title ==='About' ? 'footer__about' : ''}`)
+footer.footer(class=`${meta.title ==='Acerca de' ? 'footer__about' : ''}`)
   block footer
 
     //- EXTRA STUFF GOES HERE IF THE PAGE IS ABOUT PAGE
@@ -9,7 +9,7 @@ footer.footer(class=`${meta.title ==='About' ? 'footer__about' : ''}`)
     //- NAVIGATION
     nav.footer__nav-box(aria-label='Navegación principal')
       ul.footer__nav 
-        - if (meta.title !=='About') 
+        - if (meta.title !=='Acerca de') 
           li.footer__nav-item: a.footer__nav-link.footer__link(href="/about") Acerca de
         li.footer__nav-item: a.footer__nav-link.footer__link(href="/search") Búsqueda
         li.footer__nav-item: a.footer__nav-link.footer__link(href="https://github.com/darlopvil/quetre-fork") Código fuente
