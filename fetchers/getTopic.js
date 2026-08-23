@@ -27,7 +27,7 @@ const data = {
   isAdult: rawData.adult,
   mostViewedAuthors: rawData.mostViewedAuthors.map(author => ({
     uid: author.user.uid,
-    name: `${author.user.names[0].givenName} ${author.user.names[0].familyName}`,
+    name: `${author.user.names[0]?.givenName ?? ''} ${author.user.names[0]?.familyName ?? ''}`.trim(),
     profile: quetrefy(author.user.profileUrl),
     image: author.user.profileImageUrl,
     isAnon: author.user.isAnon,

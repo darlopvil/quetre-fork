@@ -25,7 +25,7 @@ const getAnswers = async (slug, lang) => {
       image: answer.author.profileImageUrl,
       isVerified: answer.author.isVerified,
       url: quetrefy(answer.author.profileUrl),
-      name: `${answer.author.names[0].givenName} ${answer.author.names[0].familyName}`,
+      name: `${answer.author.names[0]?.givenName ?? ''} ${answer.author.names[0]?.familyName ?? ''}`.trim(),
       credential: answer.authorCredential?.translatedString,
       // additionalCredentials: answer.node.answer?.credibilityFacts.map(),
     },

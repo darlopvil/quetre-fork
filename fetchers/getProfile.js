@@ -24,7 +24,7 @@ const feedAnswerCleaner = answer => ({
     image: answer.author.profileImageUrl,
     isVerified: answer.author.isVerified,
     url: quetrefy(answer.author.profileUrl),
-    name: `${answer.author.names[0].givenName} ${answer.author.names[0].familyName}`,
+    name: `${answer.author.names[0]?.givenName ?? ''} ${answer.author.names[0]?.familyName ?? ''}`.trim(),
     credential: answer.authorCredential?.translatedString,
     // additionalCredentials: answer?.credibilityFacts.map(),
   },
@@ -57,7 +57,7 @@ const feedPostCleaner = post => ({
     isVerified: post.author.isVerified,
     isPlusUser: post.author.consumerBundleActive,
     url: quetrefy(post.author.profileUrl),
-    name: `${post.author.names[0].givenName} ${post.author.names[0].familyName}`,
+    name: `${post.author.names[0]?.givenName ?? ''} ${post.author.names[0]?.familyName ?? ''}`.trim(),
     credential: post.authorCredential?.translatedString,
   },
   ...(post.tribeItem && {
@@ -121,7 +121,7 @@ const getProfile = async (slug, lang) => {
     basic: {
       uid: rawData.uid,
       image: rawData.profileImageUrl,
-      name: `${rawData.names[0].givenName} ${rawData.names[0].familyName}`,
+      name: `${rawData.names[0]?.givenName ?? ''} ${rawData.names[0]?.familyName ?? ''}`.trim(),
       profile: quetrefy(rawData.profileUrl),
       isDeceased: rawData.isDeceased,
       isBusiness: rawData.businessStatus,

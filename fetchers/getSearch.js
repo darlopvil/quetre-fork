@@ -31,7 +31,7 @@ const profileCleaner = profile => ({
   type: 'profile',
   credential: profile.bestCredential?.translatedString,
   isAnon: profile.isAnon,
-  name: `${profile.names[0]?.givenName} ${profile.names[0]?.familyName}`,
+  name: `${profile.names[0]?.givenName ?? ''} ${profile.names[0]?.familyName ?? ''}`.trim(),
   url: quetrefy(profile.profileUrl),
   image: profile.profileImageUrl,
   numFollowers: profile.followerCount,
@@ -80,7 +80,7 @@ const answerCleaner = ({ question, previewAnswer: answer }) => ({
     isVerified: answer.author.isVerified,
     isPlusUser: answer.author.consumerBundleActive,
     url: quetrefy(answer.author.profileUrl),
-    name: `${answer.author.names[0].givenName} ${answer.author.names[0].familyName}`,
+    name: `${answer.author.names[0]?.givenName ?? ''} ${answer.author.names[0]?.familyName ?? ''}`.trim(),
     credential: answer.authorCredential?.translatedString,
   },
 });
@@ -106,7 +106,7 @@ const postCleaner = post => ({
     isVerified: post.author.isVerified,
     isPlusUser: post.author.consumerBundleActive,
     url: quetrefy(post.author.profileUrl),
-    name: `${post.author.names[0].givenName} ${post.author.names[0].familyName}`,
+    name: `${post.author.names[0]?.givenName ?? ''} ${post.author.names[0]?.familyName ?? ''}`.trim(),
     credential: post.authorCredential?.translatedString,
   },
   ...(post.tribeItem && {
