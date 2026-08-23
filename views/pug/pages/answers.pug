@@ -17,7 +17,7 @@ block content
       h1.heading.heading__primary.answers__question
         +spansChecker(data.question.text[0].spans)
       .answers__metadata
-        p.answers__answers-total= `${ data.numAnswers ? 'Total answers: ' + data.numAnswers : 'Unanswered'}`
+        p.answers__answers-total= `${ data.numAnswers ? 'Respuestas totales: ' + data.numAnswers : 'No respondidas'}`
         p.answers__answers-shown Respuestas visibles: #{data.answers.length}
         +quorafyUrl(meta.url)(class='answers__question-link answers__link')
 

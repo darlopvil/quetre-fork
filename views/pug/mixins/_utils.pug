@@ -29,7 +29,7 @@ mixin quetrefyUrl(url, text)
 
   a(href=link)&attributes(attributes)= text
 
-mixin quorafyUrl(url, text='View on Quora')
+mixin quorafyUrl(url, text='Ver en Quora')
   -
     const link = new URL(`${url.pathname}${url.search}`, 'https://www.quora.com');
     const lang = link.searchParams.get('lang');
