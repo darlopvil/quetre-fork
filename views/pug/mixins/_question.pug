@@ -15,10 +15,10 @@ mixin addQuestion(question)
         +spansChecker(question.text[0].spans)
 
     .metadata-secondary
-      +addMetadataSecondary('clock', 'Asked', question.creationTime, 'date')
+      +addMetadataSecondary('clock', 'Preguntada', question.creationTime, 'date')
       if question.lastFollowTime
-        +addMetadataSecondary('clock-edit', 'Last followed', question.lastFollowTime, 'date')
-      +addMetadataSecondary('users', 'Followers', question.numFollowers)
+        +addMetadataSecondary('clock-edit', 'Último seguidor', question.lastFollowTime, 'date')
+      +addMetadataSecondary('users', 'seguidores', question.numFollowers)
       if question.numAnswers
-        +addMetadataSecondary('answers', 'Answers', question.numAnswers)
-      +addMetadataSecondary('comments', 'Comments', question.numComments)
+        +addMetadataSecondary('answers', 'Respuestas', question.numAnswers)
+      +addMetadataSecondary('comments', 'Comentarios', question.numComments)

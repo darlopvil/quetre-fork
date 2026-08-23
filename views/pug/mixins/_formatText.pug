@@ -39,7 +39,7 @@ mixin formatText(text)
     //-  handle images
     -if(para.type ==='image')
       .text__para.text__image-container
-        +proxifyImg(para.spans[0].modifiers.master_url)(class='text__image', alt='User embedded image')
+        +proxifyImg(para.spans[0].modifiers.master_url)(class='text__image', alt='Imagen incrustada por el usuario')
     //- handle code blocks
     - else if (para.type ==='code')
       pre.text__para.text__code: code

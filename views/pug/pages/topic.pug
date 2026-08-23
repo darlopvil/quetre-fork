@@ -17,19 +17,19 @@ block content
         +proxifyImg(data.image)(class='metadata-primary__image', alt='', aria-hidden='true')
       .metadata-secondary
         if data.isAdult
-          +addMetadataSecondary('danger', 'Adult Topic', '18+', true)
+          +addMetadataSecondary('danger', 'Tema adulto', '18+', true)
         +quorafyUrl(meta.url)(class='link')
 
     //- AUTHORS RELATED TO THE TOPIC AND METADATA
     .topic__famous-authors.famous-authors
-      h2.heading.heading__secondary Most viewed authors
+      h2.heading.heading__secondary Autores más leídos
       .famous-authors__list
         each author in data.mostViewedAuthors
           .famous-authors__item
             .metadata-primary
               p.metadata-primary__heading
                 if author.isAnon
-                  span Anonymous
+                  span Anónimo
                 else
                   a.link(href=author.profile)= author.name 
                 if author.isVerified
@@ -39,13 +39,13 @@ block content
               +proxifyImg(author.image)(class='metadata-primary__image', alt='', aria-hidden='true')
               p.metadata-primary__misc(aria-label=`${author.name}'s credentials`)= author.credential || ''
             .metadata-secondary
-              +addMetadataSecondary('user', 'Followers', author.numFollowers)
-              +addMetadataSecondary('eye', 'Views', author.numViews)
-              +addMetadataSecondary('comments', 'Answers', author.numAnswers)
+              +addMetadataSecondary('user', 'Seguidores', author.numFollowers)
+              +addMetadataSecondary('eye', 'Vistas', author.numViews)
+              +addMetadataSecondary('comments', 'Respuestas', author.numAnswers)
 
     //- RELATED TOPICS
     .topic__related-topics.related-topics
-      h2.heading.heading__secondary Related Topics
+      h2.heading.heading__secondary Temas relacionados
       .related-topics__list
         each topic in data.relatedTopics
           .metadata-primary
@@ -53,4 +53,4 @@ block content
             +proxifyImg(topic.image)(class='metadata-primary__image', aria-hidden='true', alt='')
             p.metadata-primary__misc
               +formatNumber(topic.numFollowers)
-              |&nbsp;Followers
+              |&nbsp;Seguidores

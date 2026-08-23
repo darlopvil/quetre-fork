@@ -7,14 +7,14 @@ footer.footer(class=`${meta.title ==='About' ? 'footer__about' : ''}`)
     //- EXTRA STUFF GOES HERE IF THE PAGE IS ABOUT PAGE
 
     //- NAVIGATION
-    nav.footer__nav-box(aria-label='Primary navigation')
+    nav.footer__nav-box(aria-label='Navegación principal')
       ul.footer__nav 
         - if (meta.title !=='About') 
-          li.footer__nav-item: a.footer__nav-link.footer__link(href="/about") About
-        li.footer__nav-item: a.footer__nav-link.footer__link(href="/search") Search
-        li.footer__nav-item: a.footer__nav-link.footer__link(href="https://github.com/darlopvil/quetre-fork") Source Code
-        li.footer__nav-item: a.footer__nav-link.footer__link(href="/privacy") Privacy
-        li.footer__nav-item: a.footer__nav-link.footer__link(href="#") Back to top 
+          li.footer__nav-item: a.footer__nav-link.footer__link(href="/about") Acerca de
+        li.footer__nav-item: a.footer__nav-link.footer__link(href="/search") Búsqueda
+        li.footer__nav-item: a.footer__nav-link.footer__link(href="https://github.com/darlopvil/quetre-fork") Código fuente
+        li.footer__nav-item: a.footer__nav-link.footer__link(href="/privacy") Privacidad
+        li.footer__nav-item: a.footer__nav-link.footer__link(href="#") Volver arriba 
 
     //- LICENSE
-    em.footer__license Quetre does not host any content. All content is from Quora. Quora is a tradmark of Quora Inc.
+    em.footer__license Quetre no aloja ningún contenido. Todo el contenido es de Quora. Quora es una marca registrada de Quora Inc.

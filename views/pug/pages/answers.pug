@@ -18,26 +18,26 @@ block content
         +spansChecker(data.question.text[0].spans)
       .answers__metadata
         p.answers__answers-total= `${ data.numAnswers ? 'Total answers: ' + data.numAnswers : 'Unanswered'}`
-        p.answers__answers-shown Viewable answers: #{data.answers.length}
+        p.answers__answers-shown Respuestas visibles: #{data.answers.length}
         +quorafyUrl(meta.url)(class='answers__question-link answers__link')
 
     //- ANSWERS TO THIS QUESTION
     .answers-box.answers__answers-box
-      h2.heading.heading__secondary.answers__answers-box-heading Answers
+      h2.heading.heading__secondary.answers__answers-box-heading Respuestas
       .answers-box__list
         each answer in data.answers
           +addAnswer(answer) 
 
     //- TOPICS TAGGED WITH THIS QUESTION
     aside.topics.answers__topics 
-      h2.heading.heading__secondary.answers__topic-heading Tagged Topics
+      h2.heading.heading__secondary.answers__topic-heading Temas etiquetados
       ul.topics__list
         each topic in data.topics
           li.topics__item:  a.topics__link.answers__link(href=topic.url)= topic.name
 
     //- RELATED QUESTIONS
     aside.related.answers__related
-      h2.heading.heading__secondary.answers__related-heading Related Questions
+      h2.heading.heading__secondary.answers__related-heading Preguntas relacionadas
       ul.related__questions 
         each question in data.relatedQuestions
           li.related__question-item: a.related__question-link.answers__link(href=question.url)

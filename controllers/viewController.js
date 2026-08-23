@@ -36,11 +36,10 @@ export const search = catchAsyncErrors(async (req, res, next) => {
 export const about = (req, res, _next) => {
   res.render('about', {
     meta: {
-      title: 'About',
+      title: 'Acerca de',
       url: req.urlObj,
       imageUrl: `${req.urlObj.origin}/icon.svg`,
-      description:
-        'Quetre is a libre front-end for Quora. See any answer without being tracked, without being required to log in, and without being bombarded by pesky ads.',
+      description: 'Quetre es un frontend libre para Quora. Lee cualquier respuesta sin rastreo, sin registro y sin anuncios.',
     },
   });
 };
@@ -49,10 +48,10 @@ export const about = (req, res, _next) => {
 export const privacy = (req, res, _next) => {
   res.render('privacy', {
     meta: {
-      title: 'Privacy',
+      title: 'Privacidad',
       url: req.urlObj,
       imageUrl: `${req.urlObj.origin}/icon.svg`,
-      description: 'Privacy Policy of Quetre, a libre front-end for Quora.',
+      description: 'Política de privacidad de Quetre, un frontend libre para Quora.',
     },
   });
 };
@@ -63,7 +62,7 @@ export const archive = catchAsyncErrors(async (req, res, _next) => {
   res.status(200).render('archive', {
     data: { entries },
     meta: {
-      title: 'Archive',
+      title: 'Archivo',
       url: req.urlObj,
       imageUrl: `${req.urlObj.origin}/icon.svg`,
       description: 'Contenido guardado localmente.',
@@ -74,14 +73,14 @@ export const archive = catchAsyncErrors(async (req, res, _next) => {
 /** @type {import("express").RequestHandler} */
 export const unimplemented = (req, res, _next) => {
   const data = {
-    message: "This route isn't yet implemented. Check back sometime later!",
+    message: "Esta ruta aún no está implementada. ¡Intentálo más tarde!",
     statusCode: 501,
   };
 
   res.status(data.statusCode).render('error', {
     data,
     meta: {
-      title: 'Not yet implemented',
+      title: 'No implementado',
       url: req.urlObj,
       imageUrl: `${req.urlObj.origin}/icon.svg`,
       description: data.message,
@@ -92,14 +91,14 @@ export const unimplemented = (req, res, _next) => {
 /** @type {import("express").RequestHandler} */
 export const gone = (req, res, _next) => {
   const data = {
-    message: "This route doesn't exist anymore.",
+    message: 'Esta ruta todavía no está implementada.',
     statusCode: 410,
   };
 
   res.status(data.statusCode).render('error', {
     data,
     meta: {
-      title: 'Gone',
+      title: 'No disponible',
       url: req.urlObj,
       imageUrl: `${req.urlObj.origin}/icon.svg`,
       description: data.message,

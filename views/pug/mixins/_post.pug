@@ -21,7 +21,7 @@ mixin addPost(post)
       .answer__metdata-primary.metadata-primary
         p.metadata-primary__heading
           if post.author.isAnon
-            span Anonymous
+            span Anónimo
           else
             a.answers__link(href=post.author.url)= post.author.name
           if post.author.isVerified
@@ -43,14 +43,14 @@ mixin addPost(post)
       unless post.isViewable
         p.answer__unviewable
           svg.answer__icon: use(href='/misc/sprite.svg#icon-danger')
-          | This is a Quora plus answer and hence full answer is not viewable.
+          | Esta es una respuesta de Quora Plus, así que no se puede ver completa.
 
     //- POST METADATA
     section.answer__metadata-secondary.metadata-secondary
-      +addMetadataSecondary('clock', 'Answered', post.creationTime, 'date')
+      +addMetadataSecondary('clock', 'Respondida', post.creationTime, 'date')
       if post.updatedTime
-        +addMetadataSecondary('clock-edit', 'Updated', post.updatedTime, 'date')
-      +addMetadataSecondary('eye', 'Views', post.numViews)
-      +addMetadataSecondary('arrow-up', 'Upvotes', post.numUpvotes)
-      +addMetadataSecondary('comments', 'Comments', post.numComments)
-      +addMetadataSecondary('share', 'Shares', post.numShares)
+        +addMetadataSecondary('clock-edit', 'Actualizada', post.updatedTime, 'date')
+      +addMetadataSecondary('eye', 'Vistas', post.numViews)
+      +addMetadataSecondary('arrow-up', 'Votos', post.numUpvotes)
+      +addMetadataSecondary('comments', 'Comentarios', post.numComments)
+      +addMetadataSecondary('share', 'Compartidos', post.numShares)

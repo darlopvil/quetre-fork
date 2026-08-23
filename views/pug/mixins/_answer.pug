@@ -14,7 +14,7 @@ mixin addAnswer(answer, includeQuestion=false)
     .metadata-primary
       p.metadata-primary__heading
         if answer.author.isAnon
-          span Anonymous
+          span Anónimo
         else
           a.link.metadata-primary__link(href=answer.author.url)= answer.author.name
         if answer.author.isVerified
@@ -27,7 +27,7 @@ mixin addAnswer(answer, includeQuestion=false)
     //- ORIGINAL QUESTION
     if includeQuestion
       p.answer__question.heading.heading__tertiary
-        span Answered to&nbsp;
+        span Respuesta a&nbsp;
         a.answer__link.answers__link(href=answer.question.url)
           +spansChecker(answer.question.text[0].spans)
     else if answer.originalQuestion && !answer.answersThisQuestion
@@ -44,14 +44,14 @@ mixin addAnswer(answer, includeQuestion=false)
       unless answer.isViewable
         p.answer__unviewable
           svg.icon.answer__icon: use(href='/misc/sprite.svg#icon-danger')
-          | This is a Quora plus answer and hence full answer is not viewable.
+          | Esta es una respuesta de Quora Plus, así que no se puede ver completa.
 
     //- ANSWER METADATA
     section.answer__metadata-secondary.metadata-secondary
-      +addMetadataSecondary('clock', 'Answered', answer.creationTime, 'date')
+      +addMetadataSecondary('clock', 'Respondida', answer.creationTime, 'date')
       if answer.updatedTime
-        +addMetadataSecondary('clock-edit', 'Updated', answer.updatedTime, 'date')
-      +addMetadataSecondary('eye', 'Views', answer.numViews)
-      +addMetadataSecondary('arrow-up', 'Upvotes', answer.numUpvotes)
-      +addMetadataSecondary('comments', 'Comments', answer.numComments)
-      +addMetadataSecondary('share', 'Shares', answer.numShares)
+        +addMetadataSecondary('clock-edit', 'Actualizada', answer.updatedTime, 'date')
+      +addMetadataSecondary('eye', 'Vistas', answer.numViews)
+      +addMetadataSecondary('arrow-up', 'Votos', answer.numUpvotes)
+      +addMetadataSecondary('comments', 'Comentarios', answer.numComments)
+      +addMetadataSecondary('share', 'Compartidos', answer.numShares)

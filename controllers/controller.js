@@ -28,7 +28,7 @@ export const answers = catchAsyncErrors(async (req, res, next) => {
 
   res.locals.data = data;
   res.locals.title = title;
-  res.locals.description = `Answers to ${title}`;
+  res.locals.description = `Respuestas a ${title}`;
 
   next();
 });
@@ -42,7 +42,7 @@ export const topic = catchAsyncErrors(async (req, res, next) => {
 
   res.locals.data = data;
   res.locals.title = data.name;
-  res.locals.description = `Information about ${data.name} topic.`;
+  res.locals.description = `Información sobre el tema ${data.name}.`;
 
   next();
 });
@@ -56,7 +56,7 @@ export const profile = catchAsyncErrors(async (req, res, next) => {
 
   res.locals.data = data;
   res.locals.title = data.basic.name;
-  res.locals.description = `${data.basic.name}'s profile.`;
+  res.locals.description = `Perfil de ${data.basic.name}.`;
 
   next();
 });

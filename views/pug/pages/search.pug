@@ -16,23 +16,23 @@ include ../mixins/_metadata
 block content
   main#main(class=`main search ${data.searchData ? '' :'search--no-results'}`)
     - 
-      const typesArr = [{key: 'question', text: 'Questions'}, {key: 'answer', text: 'Answers'}, {key: 'post', text: 'Posts'}, {key: 'profile', text: 'Profiles'}, {key: 'topic', text: 'Topics'}, {key: 'tribe', text: 'Spaces'}]
-      const timesArr = [{key: 'hour', text: 'Hour'}, {key: 'day', text: 'Day'}, {key: 'week', text: 'Week'}, {key: 'month', text: 'Month'}, {key: 'year', text: 'Year'}] 
+      const typesArr = [{key: 'question', text: 'Preguntas'}, {key: 'answer', text: 'Respuestas'}, {key: 'post', text: 'Publicaciones'}, {key: 'profile', text: 'Perfiles'}, {key: 'topic', text: 'Temas'}, {key: 'tribe', text: 'Espacios'}]
+      const timesArr = [{key: 'hour', text: 'Hora'}, {key: 'day', text: 'Día'}, {key: 'week', text: 'Semana'}, {key: 'month', text: 'Mes'}, {key: 'year', text: 'Año'}]
 
     form.search__form.search-form(action="/search", method='get', autocomplete='off', name='search')
       .search-form__search-container
-        input.search-form__searchbar(type="search", name="q", placeholder='Enter your query...', minlength='3', aria-label='search for anything')
+        input.search-form__searchbar(type="search", name="q", placeholder='Escribe tu búsqueda...', minlength='3', aria-label='busca lo que quieras')
         button.search-form__button.search-form__button--reset(type="reset", aria-label='clear searchbar and filters'): svg.icon: use(href='/misc/sprite.svg#icon-cross')
         button.search-form__button.search-form__button--submit(type="submit", aria-label='search'): svg.icon: use(href='/misc/sprite.svg#icon-search')
       .search-form__filters-container.search-form__filters-container--type
-        p.search-form__filters-heading Filter by Type
+        p.search-form__filters-heading Filtrar por tipo
         each item in typesArr
           .search-form__filters-group
             input.search-form__radio.visually-hidden(type="radio", name="type", value=item.key, id=`type--${item.key}`) 
             label.search-form__label(for=`type--${item.key}`)= item.text
 
       .search-form__filters-container.search-form__filters-container--time
-        p.search-form__filters-heading Filter by Time
+        p.search-form__filters-heading Filtrar por fecha
         each item in timesArr
           .search-form__filters-group
             input.search-form__radio.visually-hidden(type="radio", name='time', value=item.key, id=`time--${item.key}`) 
@@ -41,9 +41,9 @@ block content
     //- TODO: refactor 'profile', 'topic', and 'space' into resusable mixins.
     - if (data.searchData?.results)
       section.search__results.search-results
-        h1.heading.heading__primary= `Results for '${data.searchText}'`
+        h1.heading.heading__primary= `Resultados de '${data.searchText}'`
         - if (data.searchData.results.length === 0)
-          p No results found for the query. Try being less specific and/or removing filters.
+          p No se han encontrado resultados. Prueba a ser menos específico o a quitar filtros.
         - else
           .search-results__container
             each item in data.searchData.results
@@ -73,7 +73,7 @@ block content
                     +proxifyImg(item.image)(class='metadata-primary__image', aria-hidden='true', alt='')
                     p.metadata-primary__misc
                       +formatNumber(item.numFollowers)
-                      |&nbsp;Followers
+                      |&nbsp;seguidores
                 - else if (item.type === 'space')
                   .metadata-primary.profile-spaces__list-item
                     +proxifyImg(item.image)(class='metadata-primary__image', alt='', aria-hidden='true')

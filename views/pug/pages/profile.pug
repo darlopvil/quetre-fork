@@ -40,86 +40,86 @@ block content
           h1.heading.heading__primary.metadata-primary__heading.profile-meta__heading-name.profile__name= data.basic.name
             if data.basic.isVerified
               svg.icon.metadata-primary__icon.profile-meta__icon
-                title verified
+                title verificado
                 use(href='/misc/sprite.svg#icon-verified')
             if data.basic.isPlusUser
               svg.icon.metadata-primary__icon.profile-meta__icon
-                title Quora+ user
+                title usuario de Quora+
                 use(href='/misc/sprite.svg#icon-quoraplus')
           p.metadata-primary__misc.profile-meta__credential= data.credentials.mainCredential
         .metadata-secondary
           if data.basic.isBanned
-            +addMetadataSecondary('user-remove', 'Banned', '', 'empty')
+            +addMetadataSecondary('user-remove', 'Baneado', '', 'empty')
           if data.basic.isBot
             +addMetadataSecondary('danger', 'Bot', '', 'empty')
           if data.basic.isDeactivated
-            +addMetadataSecondary('user-remove', 'Deactivated', '', 'empty')
+            +addMetadataSecondary('user-remove', 'Desactivado', '', 'empty')
           if data.basic.isDeleted
-            +addMetadataSecondary('user-remove', 'Deleted', '', 'empty')
+            +addMetadataSecondary('user-remove', 'Eliminado', '', 'empty')
           if data.basic.isDeceased
-            +addMetadataSecondary('flower', 'Deceased', '', 'empty')
+            +addMetadataSecondary('flower', 'Fallecido', '', 'empty')
           if data.basic.isBusiness
-            +addMetadataSecondary('briefcase', 'Business', '', 'empty')
+            +addMetadataSecondary('briefcase', 'Empresa', '', 'empty')
           +quorafyUrl(meta.url)(class='link')
 
       if data.profileFeed.description[0].spans[0].text
         .profile-meta__description
-          h2.heading.heading__secondary.profile-meta__heading-description Self description
+          h2.heading.heading__secondary.profile-meta__heading-description Descripción
           .text__container
             +formatText(data.profileFeed.description)
 
     .profile__stats.profile-stats
       section.profile__highlights.profile-highlights
-        h2.heading.heading__secondary.profile-highlights__heading Highlights
+        h2.heading.heading__secondary.profile-highlights__heading Destacados
         ul.profile-highlights__list
-          +addNumericStats(data.basic.numFollowers, 'Followers', 'users')
-          +addNumericStats(data.basic.numFollowing, 'Following', 'users')
-          +addNumericStats(data.basic.numAnswers, 'Answers', 'answers')
-          +addNumericStats(data.basic.numQuestions, 'Questions', 'question')
-          +addNumericStats(data.basic.numPosts, 'Posts', 'post')
-          +addNumericStats(data.highlights.numAnswerViews, 'Answer views', 'eye')
-          +addNumericStats(data.highlights.numLastMonthAnswerViews, 'Answer views this month', 'eye')
+          +addNumericStats(data.basic.numFollowers, 'Seguidores', 'users')
+          +addNumericStats(data.basic.numFollowing, 'Siguiendo', 'users')
+          +addNumericStats(data.basic.numAnswers, 'Respuestas', 'answers')
+          +addNumericStats(data.basic.numQuestions, 'preguntas', 'question')
+          +addNumericStats(data.basic.numPosts, 'Publicaciones', 'post')
+          +addNumericStats(data.highlights.numAnswerViews, 'Vistas de respuestas', 'eye')
+          +addNumericStats(data.highlights.numLastMonthAnswerViews, 'Vistas este mes', 'eye')
           - if(data.highlights.topWriterYears)  
             li.profile-highlights__item
               svg.icon.metadata-primary__icon.profile-stats__icon
                 use(href='/misc/sprite.svg#icon-pen')
-              span Top Writer #{data.highlights.topWriterYears}
+              span Autor destacado #{data.highlights.topWriterYears}
           - if(data.highlights.publishedWriterIn)  
             li.profile-highlights__item
               svg.icon.metadata-primary__icon.profile-stats__icon
                 use(href='/misc/sprite.svg#icon-pen')
               span
-                | Published Writer in #{data.highlights.publishedWriterIn}.&nbsp;
+                | Publicado en #{data.highlights.publishedWriterIn}.&nbsp;
                 a.link(href=`${data.basic.profile}/answers/published`) Ver respuestas publicadas
           - if(data.highlights.topAskerYears)  
             li.profile-highlights__item
               svg.icon.metadata-primary__icon.profile-stats__icon
                 use(href='/misc/sprite.svg#icon-question')
-              span Top Question asker #{data.highlights.topAskerYears}
+              span Preguntador destacado #{data.highlights.topAskerYears}
           - if(data.basic.twitterUsername)
             li.profile-highlights__item
               svg.icon.metadata-primary__icon.profile-stats__icon
                 use(href='/misc/sprite.svg#icon-twitter')
-              span Twitter username: #{data.basic.twitterUsername}
+              span Usuario de Twitter: #{data.basic.twitterUsername}
           li.profile-highlights__item
             svg.icon.metadata-primary__icon.profile-stats__icon
               use(href='/misc/sprite.svg#icon-user-clock')
-            p Joined&nbsp;
+            p Se unió&nbsp;
               +addDate(data.highlights.creationTime)
 
       section.profile__credentials.profile-credentials
-        h2.heading.heading__secondary.profile-credentials__heading Credentials
+        h2.heading.heading__secondary.profile-credentials__heading Credenciales
         ul.profile-credentials__list
           -if (data.credentials.languageCredential)
             li.profile-credentials__item
               svg.icon.metadata-primary__icon.profile-stats__icon
-                title Language
+                title Idioma
                 use(href='/misc/sprite.svg#icon-globe')
-              span Knows #{data.credentials.languageCredential}
+              span Habla #{data.credentials.languageCredential}
           -if (data.credentials.workCredential)
             li.profile-credentials__item
               svg.icon.metadata-primary__icon.profile-stats__icon
-                title Work
+                title Trabajo
                 use(href='/misc/sprite.svg#icon-briefcase')
               p
                 span= data.credentials.workCredential.position
@@ -128,7 +128,7 @@ block content
           -if (data.credentials.schoolCredential)
             li.profile-credentials__item
               svg.icon.metadata-primary__icon.profile-stats__icon
-                title School
+                title Estudios
                 use(href='/misc/sprite.svg#icon-degree')
               p
                 span= data.credentials.schoolCredential.degree
@@ -140,14 +140,14 @@ block content
               svg.icon.metadata-primary__icon.profile-stats__icon
                 title Location
                 use(href='/misc/sprite.svg#icon-location')
-              p Lives
+              p Ubicación
                 span= ` in ${data.credentials.locationCredential.location || '-'}`
                 +addTimeRange(data.credentials.locationCredential.startYear, data.credentials.locationCredential.startYear)
 
       section.profile__spaces.profile-spaces
-        h2.heading.heading__secondary Spaces   
+        h2.heading.heading__secondary Espacios   
         p.profile-spaces__info
-          span.profile-spaces__item Active in #{data.spaces.numActiveInSpaces} spaces
+          span.profile-spaces__item Activo en #{data.spaces.numActiveInSpaces} espacios
         ul.profile-spaces__list
           each space in data.spaces.spaces
             li.metadata-primary.profile-spaces__list-item
@@ -155,13 +155,13 @@ block content
               a.link.metadata-primary__heading(href=space.url)= space.name
               p.metadata-primary__misc
                 +formatNumber(space.numItems)
-                |&nbsp;items
+                |&nbsp;elementos
                 //- if space.isSensitive
                   svg.answer__icon: use(href='/misc/sprite.svg#icon-arrow-up')
                   span sensitive space
 
       section.profile__topics.profile-topics
-        h2.heading.heading__secondary.profile-topics__heading Topics
+        h2.heading.heading__secondary.profile-topics__heading Temas
         ul.profile-topics__list
           each topic in data.topics.topics
             li.metadata-primary.profile-topics__list-item
@@ -169,13 +169,13 @@ block content
               a.link.metadata-primary__heading(href=topic.url)= topic.name
               p.metadata-primary__misc
                 +formatNumber(topic.numAnswers)
-                |&nbsp;Answers
+                |&nbsp;Respuestas
                 //- if topic.isSensitive
                   svg.icon.metadata-primary__icon: use(href='/misc/sprite.svg#icon-arrow-up')
                   span sensitive topic
 
     section.profile__feed.profile-feed
-      h2.heading.heading__secondary Feed
+      h2.heading.heading__secondary Publicaciones
       .profile-feed__container
         each item in data.profileFeed.feed
           .profile-feed__item
