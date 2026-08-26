@@ -86,3 +86,29 @@ export const checkCache = cacheKeyFunction =>
 
     next();
   });
+
+/**
+ * los escaneres de vulnerabilidades barren cientos de rutas por segundo. Las de
+ * un solo segmento casan con /:slug y acaban pidiendose a Quora una por una, lo
+ * que dispara su rate limit y deja la instancia en cooldown. CrowdSec banea al
+ * escaner, pero necesita acumular eventos: la primera rafaga entra entera.
+ *
+ * Los slugs de Quora son frases: siempre llevan guion y nunca punto.
+ * @type {import("express").RequestHandler}
+ */
+export const excludeStaticPaths = (req, _res, next) => {
+  const slug = req.params.slug ?? req.params.name ?? '';
+
+  const sospechoso =
+    slug.includes('.') ||
+    !slug.includes('-') ||
+    /^[_@~]/.test(slug);
+
+  if (sospechoso) {
+    const e = new AppError('No encontrado', 404);
+    e.code = 'NOT_A_SLUG';
+    return next(e);
+  }
+
+  return next();
+};

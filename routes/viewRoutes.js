@@ -1,6 +1,6 @@
 import express from 'express';
 import { about, privacy, unimplemented, gone, archive, search } from '../controllers/viewController.js';
-import { checkCache, checkRateLimit, setCache } from '../middlewares/middlewares.js';
+import { checkCache, checkRateLimit, setCache, excludeStaticPaths } from '../middlewares/middlewares.js';
 import { render } from '../middlewares/viewMiddlewares.js';
 import { answers, topic, profile, redirect, published } from '../controllers/controller.js';
 import { answersKey, profileKey, topicKey, searchKey, publishedKey } from '../utils/cacheKeys.js';
@@ -54,7 +54,7 @@ viewRouter.get('/space/:name', unimplemented);
 viewRouter.get('/space/:name/:slug', unimplemented);
 viewRouter.get(
   '/:slug',
-  // excludeStaticPaths,
+   excludeStaticPaths,
   checkCache(answersKey),
   checkRateLimit,
   answers,
