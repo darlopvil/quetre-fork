@@ -13,25 +13,33 @@ públicas devuelven error. Este fork restaura el funcionamiento del servicio.
 
 ## Por qué existe este fork
 
-Quora está detrás de Cloudflare y devuelve un **Managed Challenge**
-(`cf-mitigated: challenge`, la página "Just a moment…") a cualquier cliente
-HTTP. Upstream no tiene defensa alguna: envía `User-Agent: axios/x.y`, sin
-cookies, sin proxy y sin control de ritmo.
+Quora está detrás de Cloudflare, que evalúa el **fingerprint TLS y HTTP/2** del
+cliente además de sus cabeceras. Node siempre saluda como Node, por muchas
+cabeceras de navegador que se le pongan encima, así que recibe un Managed
+Challenge (`cf-mitigated: challenge`, la página "Just a moment…"). Upstream ni
+siquiera lo intenta: envía `User-Agent: axios/x.y`, sin cookies y sin control
+de ritmo.
 
-El diagnóstico completo está en los issues #1 y #2. Resumen:
+El diagnóstico completo está en los issues #1, #2 y #6. Resumen de la situación
+actual:
 
 | Cliente | Resultado |
 |---|---|
-| curl estándar, cualquier combinación de cabeceras | challenge |
-| curl con fingerprint TLS de navegador | challenge |
-| Navegador real | 200 |
-| curl estándar + `cf_clearance` | **200** |
+| axios, cualquier combinación de cabeceras | challenge |
+| curl-impersonate con fingerprint antiguo (chrome116) | challenge |
+| curl-impersonate con fingerprint reciente (chrome150) | **200** |
+| impit, fingerprint de Chrome | **200** |
 
-**Conclusión:** ningún cliente HTTP supera el challenge, porque exige ejecutar
-JavaScript. Pero una vez que un navegador lo resuelve, la `cf_clearance`
-resultante es reutilizable desde cualquier cliente: Cloudflare la ata a
-**IP de salida + User-Agent**, no al fingerprint TLS. Y es válida para todo el
-dominio, no solo para la URL que la generó.
+**Conclusión:** Cloudflare ya no reta a todo el mundo, solo a clientes con
+fingerprint anómalo. Un cliente HTTP que replique el saludo de un navegador
+pasa sin reto y sin cookies de por medio.
+
+> **Nota histórica.** Hasta agosto de 2026 Cloudflare retaba a todos por igual,
+> incluido un navegador real. La solución entonces fue distinta: un navegador
+> headless resolvía el reto y la `cf_clearance` resultante se reutilizaba desde
+> un cliente HTTP normal. Cuando Cloudflare relajó la regla, esa arquitectura
+> dejó de funcionar por un motivo curioso: sin reto no se emite clearance, así
+> que no había nada que acuñar. Se sustituyó por el transporte con fingerprint.
 
 ---
 
@@ -40,14 +48,12 @@ dominio, no solo para la URL que la generó.
 ```
 petición → ¿caché fresca en Redis?  → sí → servir
          → ¿?archived=1 y hay copia? → sí → servir del disco
-         → no → cola → axios + cf_clearance
-                        └─ ¿challenge? → acuñar → reintentar (1 vez)
+         → no → cola → impit (fingerprint de Chrome)
          → si falla → copia caducada de Redis, o del archivo en disco
 ```
 
-Un navegador headless (FlareSolverr) resuelve el challenge **solo cuando la
-clearance falta o caduca**, no en cada petición. El resto del tráfico lo sirve
-un cliente HTTP normal.
+No hay navegador, ni cookie que caduque, ni renovación que pueda fallar: el
+transporte pasa el filtro por sí mismo.
 
 Tres capas de almacenamiento, con propósitos distintos:
 
@@ -57,17 +63,15 @@ Tres capas de almacenamiento, con propósitos distintos:
 | **Disco** | Archivo permanente | Todo lo visitado, sin caducidad |
 | **Quora** | Origen | — |
 
-En la práctica: ~0,06 s con caché, ~1,4 s contra Quora, ~14 s únicamente
-cuando toca renovar la clearance.
+En la práctica: ~0,06 s con caché, ~1,4 s contra Quora.
 
 ### Piezas
 
-- **`utils/clearance.js`** — acuña el par `cf_clearance` + User-Agent y lo
-  persiste como unidad indivisible. Comparte la promesa entre peticiones
-  concurrentes para no levantar varios navegadores a la vez.
-- **`utils/axiosInstance.js`** — compone el header `Cookie`, fija el
-  User-Agent acuñado, deriva las Client Hints de él y detecta el challenge en
-  el interceptor de error.
+- **`utils/http.js`** — transporte hacia Quora con fingerprint de navegador.
+  Gestiona el jar de cookies, extrae la revisión del frontend del HTML y
+  replica la forma de error de axios para no acoplar el resto del código.
+- **`utils/imageClient.js`** — cliente aparte para el proxy de imágenes. Va al
+  CDN, sin Cloudflare delante, y necesita respuesta en streaming.
 - **`utils/queue.js`** — serializa las peticiones a Quora con intervalo mínimo
   y jitter.
 - **`utils/upstreamError.js`** — traduce cada fallo a un código identificable.
@@ -85,6 +89,8 @@ que aportaba cabeceras de navegador, persistencia de cookies y cooldown.
 
 ### Añadido
 
+- Transporte con fingerprint de navegador, que evita el challenge en lugar de
+  tener que resolverlo.
 - Acuñación y reutilización de `cf_clearance` vía navegador headless.
 - Cola de peticiones con intervalo mínimo y jitter.
 - Caché con frescura (24 h) y retención (30 d) separadas: las entradas
@@ -127,15 +133,17 @@ está limpia y el bloqueo es por fingerprint de cliente. Cloudflare puntúa
 reputación de red, y las IPs de datacenter tienen peor score que una
 residencial: introducirlas empeoraría el problema.
 
-**Clientes HTTP con fingerprint de navegador.** Probado, recibe challenge
-igualmente. Un fingerprint mejor solo evitaría que Cloudflare *emita* el reto;
-una vez emitido, exige JavaScript.
-
-**Navegador headless como fetcher principal.** Funciona, pero cuesta ~20 s por
-petición frente a ~1,4 s. Se conserva únicamente como acuñador.
+**Navegador headless como transporte.** Funciona, pero cuesta ~4 s por petición
+frente a ~1,4 s, y arrastra un Chromium con su consumo de memoria. Solo tuvo
+sentido mientras Cloudflare retaba a todos los clientes.
 
 **Rotación de User-Agent.** Rotar el UA manteniendo la misma sesión es más
-sospechoso que un UA fijo. Además la clearance está ligada al UA que la emitió.
+sospechoso que un UA fijo, y además debe ser coherente con el fingerprint del
+transporte.
+
+**Cola dentro del cliente HTTP.** El proxy de imágenes usaba la misma instancia
+pero apunta al CDN: serializarlo haría que cada página tardase una eternidad.
+La cola vive en los fetchers.
 
 **Cola dentro del cliente HTTP.** El proxy de imágenes comparte instancia pero
 apunta al CDN: serializarlo haría que cada página tardase una eternidad.
@@ -150,8 +158,6 @@ Además de las variables de upstream:
 
 | Variable | Por defecto | Descripción |
 |---|---|---|
-| `FLARESOLVERR_URL` | — | URL del servicio que acuña la clearance. Sin ella el servicio no puede renovar el acceso. |
-| `FLARESOLVERR_TIMEOUT` | `120000` | Timeout de acuñación (ms). |
 | `MIN_REQUEST_INTERVAL` | `2000` | Separación mínima entre peticiones a Quora (ms), ±40% de jitter. `0` desactiva la cola. |
 | `REDIS_TTL` | `86400` | Frescura de la caché (s). |
 | `REDIS_HARD_TTL` | `2592000` | Retención real en Redis (s). Las entradas caducadas se conservan para servirlas si Quora falla. |
@@ -160,8 +166,8 @@ Además de las variables de upstream:
 | `QUORA_SESSION_COOKIES` | — | Cookies de sesión (`m-b=...; m-s=...`) para la búsqueda. Sin ellas, `/search` devuelve `SEARCH_NEEDS_SESSION`. El resto del servicio no las usa. |
 | `SEARCH_QUERY_HASH` | (valor actual) | Hash de la consulta persistida de búsqueda. Cambia cuando Quora recompila su frontend. |
 
-Redis pasa de opcional a **necesario en la práctica**: sin él la clearance no
-persiste entre reinicios y cada arranque exige acuñar de nuevo.
+Redis pasa de opcional a **muy recomendable**: sin él no hay caché y cada
+visita golpea a Quora.
 
 ---
 
@@ -205,12 +211,9 @@ propietario.
 Upstream eliminó la búsqueda en 2024 (`f49062d`) porque Quora dejó de servirla
 a usuarios anónimos. Sigue siendo cierto, y hoy hay además una segunda barrera.
 
-**Por qué no se puede scrapear.** La ruta `/search` recibe challenge de
-Cloudflare incluso con una clearance válida que en el mismo momento sirve otras
-rutas con 200: la regla cubre un conjunto de rutas. Y aunque se supere con un
-navegador real, el HTML no contiene resultados — cero marcadores del parser, 3
-blobs frente a los ~10 de una pregunta normal. Es una cáscara que rellena el
-JavaScript.
+**Por qué no se puede scrapear.** El HTML de `/search` no contiene resultados:
+cero marcadores del parser, 3 blobs frente a los ~10 de una pregunta normal. Es
+una cáscara que rellena el JavaScript tras iniciar sesión.
 
 **Cómo funciona aquí.** La búsqueda va por el endpoint GraphQL de Quora
 (`/graphql/gql_para_POST`) con consulta persistida. Requiere tres cosas:
@@ -222,6 +225,10 @@ JavaScript.
    estable mientras dure la sesión, así que se obtiene una vez y se reutiliza.
 3. **Cookies de sesión.** Sin ellas la consulta responde 200 pero con
    `searchConnection` nulo: Quora devuelve cero resultados a los anónimos.
+4. Las **cabeceras propietarias** del frontend (`quora-window-id`,
+   `quora-revision`, `quora-page-creation-time`, `quora-canary-revision`).
+   Cloudflare protege el método POST con más dureza que los GET y responde
+   challenge si faltan, aunque el fingerprint sea correcto.
 
 **La sesión se usa únicamente para la búsqueda.** El resto del servicio sigue
 siendo anónimo. Aun así, conviene emplear una cuenta desechable: las búsquedas
@@ -247,7 +254,9 @@ Aparecen en el log como `[CÓDIGO] mensaje (detalle) → url`.
 |---|---|
 | `NOT_FOUND` | La página no existe en Quora. |
 | `RATE_LIMITED` | Quora está limitando (429). Activa cooldown. |
-| `CHALLENGE_UNSOLVED` | Falló la acuñación. **Revisar el servicio acuñador.** |
+| `FORBIDDEN` | Quora rechazó la petición (403). Activa cooldown. |
+| `NOT_A_SLUG` | La ruta no tiene forma de slug de Quora. No se reenvía. |
+| `SEARCH_NEEDS_SESSION` | La búsqueda requiere sesión configurada. |
 | `EMPTY_PAYLOAD` | 200 sin datos: Quora cambió el marcado. Genera un volcado. |
 | `UPSTREAM_ERROR` | Quora devuelve 5xx. |
 | `NETWORK` | No se pudo contactar. |
@@ -255,19 +264,9 @@ Aparecen en el log como `[CÓDIGO] mensaje (detalle) → url`.
 
 ### Purgar la caché
 
-La clearance vive en la misma base de Redis que la caché. **No usar
-`FLUSHDB`**: borraría la clearance y forzaría una acuñación.
-
 ```
 redis-cli --scan --pattern 'cache:*' | xargs -r redis-cli del
 ```
-
-### Cuándo caduca la clearance
-
-El atributo de la cookie indica un año, pero Cloudflare puede invalidarla
-antes. El caso más frecuente es un **cambio de IP pública de salida**: la
-clearance muere en el acto. La detección de challenge y la re-acuñación
-automática son las que hacen que el servicio se recupere solo.
 
 ### Volcados
 
@@ -278,7 +277,7 @@ Es la única evidencia disponible si Quora cambia el marcado.
 
 ## Limitaciones heredadas
 
-- **Búsqueda:** eliminada en upstream (`f49062d`), devuelve `410`.
+- **Búsqueda:** requiere sesión configurada. Ver la sección de búsqueda.
 - **Rutas `/space/`:** nunca implementadas, devuelven `501`.
 - **Respuestas:** solo se muestran las primeras. Quora las carga
   incrementalmente y la paginación no está implementada.
