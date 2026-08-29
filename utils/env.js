@@ -2,8 +2,6 @@ import process from 'node:process';
 
 const env = {
   QUORA_BASE_URL: process.env.QUORA_BASE_URL || 'https://www.quora.com',
-  FLARESOLVERR_URL: process.env.FLARESOLVERR_URL,
-  FLARESOLVERR_TIMEOUT: Number(process.env.FLARESOLVERR_TIMEOUT) || 120000,
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: process.env.PORT || 3000,
   USER_AGENT:
@@ -26,7 +24,6 @@ const env = {
   SEARCH_QUERY_HASH:
     process.env.SEARCH_QUERY_HASH ||
     'deb8d8c3f230ef7568c0895df972ada793afb470ecd151e07453f7b7c0e51134',
-  CLEARANCE_URL: process.env.CLEARANCE_URL || 'https://www.quora.com/What-is-Linux-4',
 };
 
 export default env;
