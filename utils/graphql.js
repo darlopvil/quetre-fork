@@ -1,4 +1,4 @@
-import axiosInstance from './axiosInstance.js';
+import http from './http.js';
 import enqueue from './queue.js';
 import { requestsState } from './state.js';
 import env from './env.js';
@@ -21,7 +21,7 @@ export const loadSession = () => {
 /** extrae el formkey de una pagina cualquiera. debe pedirse ya con la sesion cargada */
 const getFormkey = async (forzar = false) => {
   if (formkey && !forzar) return formkey;
-  const page = await enqueue(() => axiosInstance.get('What-is-Linux-4'));
+  const page = await enqueue(() => http.get('What-is-Linux-4'));
   formkey = (page.data.match(/"formkey":\s*"([a-f0-9]+)"/) || [])[1] || null;
   if (!formkey) log('graphql: no se pudo extraer el formkey');
   return formkey;
@@ -36,7 +36,7 @@ const getFormkey = async (forzar = false) => {
 export const gql = async (queryName, hash, variables) => {
   const enviar = async fk => {
     const r = await enqueue(() =>
-      axiosInstance.post(
+      http.post(
         `/graphql/gql_para_POST?q=${queryName}`,
         { queryName, extensions: { hash }, variables },
         {

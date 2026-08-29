@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import axiosInstance, { getBaseUrl } from '../utils/axiosInstance.js';
+import http, { getBaseUrl } from '../utils/http.js';
 import AppError from '../utils/AppError.js';
 import parse from '../utils/parse.js';
 import upstreamError from '../utils/upstreamError.js';
@@ -20,7 +20,7 @@ const fetcher = async (resourceStr, { keyword, lang, toEncode = true }) => {
     // as url might contain unescaped chars. so, encoding it right away
     const str = toEncode ? encodeURIComponent(resourceStr) : resourceStr;
     const res = await enqueue(() =>
-      axiosInstance.get(str, { baseURL: getBaseUrl(lang) })
+      http.get(str, { baseURL: getBaseUrl(lang) })
     );
 
     const $ = cheerio.load(res.data);
