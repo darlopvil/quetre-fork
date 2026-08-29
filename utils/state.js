@@ -1,5 +1,5 @@
 export const requestsState = {
-  /** cookies propias de Quora. NO contiene cf_clearance. */
+  /** cookies de sesión de Quora, fusionadas por nombre según llegan */
   /** @type {Record<string, string>} */
   cookies: {},
   /** @type {number?} */

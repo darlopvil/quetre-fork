@@ -1,4 +1,4 @@
-import axiosInstance from '../utils/axiosInstance.js';
+import imageClient from '../utils/imageClient.js';
 import catchAsyncErrors from '../utils/catchAsyncErrors.js';
 import AppError from '../utils/AppError.js';
 import getSearch from '../fetchers/getSearch.js';
@@ -49,7 +49,7 @@ export const image = catchAsyncErrors(async (req, res, _next) => {
     });
   }
 
-  const imageRes = await axiosInstance.get(path, { baseURL: `https://${domain}/`, responseType: 'stream' });
+    const imageRes = await imageClient.get(path, { baseURL: `https://${domain}/`, responseType: 'stream' });
 
   res.set('Content-Type', imageRes.headers['content-type']);
   res.set('Cache-Control', 'public, max-age=315360000');

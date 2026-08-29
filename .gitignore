@@ -7,3 +7,5 @@ dump.rdb
 docker-compose.yml
 dumps/
 store/
+.pnpm-store/
+node_modules/
