@@ -26,6 +26,7 @@ const env = {
   SEARCH_QUERY_HASH:
     process.env.SEARCH_QUERY_HASH ||
     'deb8d8c3f230ef7568c0895df972ada793afb470ecd151e07453f7b7c0e51134',
+  CLEARANCE_URL: process.env.CLEARANCE_URL || 'https://www.quora.com/What-is-Linux-4',
 };
 
 export default env;

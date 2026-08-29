@@ -1,6 +1,7 @@
 import axios from 'axios';
 import redis from './redis.js';
 import env from './env.js';
+import log from './log.js';
 
 const KEY = 'cf:clearance';
 
@@ -31,30 +32,49 @@ export const mintPair = async () => {
   inflight = (async () => {
     if (!env.FLARESOLVERR_URL) throw new Error('FLARESOLVERR_URL no configurada');
 
-    const { data } = await axios.post(
-      `${env.FLARESOLVERR_URL}/v1`,
-      {
-        cmd: 'request.get',
-        url: 'https://www.quora.com/',
-        maxTimeout: env.FLARESOLVERR_TIMEOUT,
-      },
-      { timeout: env.FLARESOLVERR_TIMEOUT + 15000 }
-    );
+    const INTENTOS = 3;
+    let ultimo = null;
 
-    if (data.status !== 'ok') throw new Error(`flaresolverr: ${data.message}`);
+    for (let i = 1; i <= INTENTOS; i++) {
+      try {
+        const { data } = await axios.post(
+          `${env.FLARESOLVERR_URL}/v1`,
+          {
+            cmd: 'request.get',
+            url: env.CLEARANCE_URL,
+            maxTimeout: env.FLARESOLVERR_TIMEOUT,
+          },
+          { timeout: env.FLARESOLVERR_TIMEOUT + 15000 }
+        );
 
-    const cookie = data.solution?.cookies?.find(c => c.name === 'cf_clearance');
-    if (!cookie) throw new Error('flaresolverr: la solución no contiene cf_clearance');
+        if (data.status !== 'ok') throw new Error(`flaresolverr: ${data.message}`);
 
-    const pair = {
-      clearance: cookie.value,
-      userAgent: data.solution.userAgent,
-      mintedAt: Date.now(),
-    };
+        const cookie = data.solution?.cookies?.find(c => c.name === 'cf_clearance');
 
-    memoryPair = pair;
-    await redis.set(KEY, JSON.stringify(pair));
-    return pair;
+        // Cloudflare puede no haber emitido la cookie todavia cuando el
+        // navegador termina: la solucion llega con status ok pero sin clearance.
+        // Reintentar suele bastar; fallar al primer intento deja la instancia
+        // sin acceso hasta la siguiente peticion del usuario.
+        if (!cookie) throw new Error('la solución no contiene cf_clearance');
+
+        const pair = {
+          clearance: cookie.value,
+          userAgent: data.solution.userAgent,
+          mintedAt: Date.now(),
+        };
+
+        memoryPair = pair;
+        await redis.set(KEY, JSON.stringify(pair));
+        if (i > 1) log(`clearance acuñada en el intento ${i}`, 'success');
+        return pair;
+      } catch (err) {
+        ultimo = err;
+        log(`acuñación fallida (intento ${i}/${INTENTOS}): ${err.message}`);
+        if (i < INTENTOS) await new Promise(r => setTimeout(r, 5000 * i));
+      }
+    }
+
+    throw ultimo;
   })().finally(() => {
     inflight = null;
   });
