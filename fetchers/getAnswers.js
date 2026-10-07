@@ -52,12 +52,12 @@ const getAnswers = async (slug, lang) => {
     },
     numAnswers: rawData.answerCount,
     answers: ansArr,
-    topics: rawData.question.topics.map(topicObj => ({
+      topics: (rawData.question.topics ?? []).map(topicObj => ({
       tid: topicObj.tid,
       name: topicObj.name,
       url: quetrefy(topicObj.url),
     })),
-    relatedQuestions: rawData.related.map(questionObj => ({
+    relatedQuestions: (rawData.related ?? []).map(questionObj => ({
       qid: questionObj.qid,
       url: quetrefy(questionObj.url),
       text: JSON.parse(questionObj.title).sections,

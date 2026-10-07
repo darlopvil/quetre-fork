@@ -46,7 +46,13 @@ const answersFetcher = async (resourceStr, lang) => {
 
         // related questions block contains both answer count and related questions
       } else if (matchedPart.bottomRelatedQuestionsInfo) {
-        rawData.related = matchedPart.bottomRelatedQuestionsInfo.relatedQuestions;
+        // Quora partio relatedQuestions en dos listas envueltas en edges/node
+        // (visibles y desbordadas). Se concatenan y se desenvuelven.
+        const info = matchedPart.bottomRelatedQuestionsInfo;
+        rawData.related = [
+          ...(info.visibleRelatedQuestions?.edges ?? []),
+          ...(info.overflowRelatedQuestions?.edges ?? []),
+        ].map(e => e.node).filter(Boolean);
         rawData.answerCount = matchedPart.answerCount;
       }
     });
