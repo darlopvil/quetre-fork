@@ -4,7 +4,7 @@ import env from './env.js';
 /**
  * cliente exclusivo para el proxy de imagenes. El CDN de Quora no tiene
  * Cloudflare delante, asi que no necesita fingerprint de navegador, y la
- * respuesta se sirve en streaming, que impit no cubre.
+ * respuesta se sirve en streaming, que el transporte con curl-impersonate no cubre.
  */
 export default axios.create({
   headers: {

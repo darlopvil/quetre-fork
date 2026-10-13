@@ -20,6 +20,9 @@ const env = {
     ? 7_200_000
     : Number(process.env.RATE_LIMIT_COOLDOWN),
   STORE_DIR: process.env.STORE_DIR ?? '/app/store',
+  CURL_IMPERSONATE: process.env.CURL_IMPERSONATE || 'chrome150',
+  CURL_IMPERSONATE_BIN: process.env.CURL_IMPERSONATE_BIN || 'curl-impersonate',
+  UPSTREAM_TIMEOUT: Number(process.env.UPSTREAM_TIMEOUT) || 30,
   QUORA_SESSION_COOKIES: process.env.QUORA_SESSION_COOKIES || '',
   SEARCH_QUERY_HASH:
     process.env.SEARCH_QUERY_HASH ||

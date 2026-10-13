@@ -11,3 +11,6 @@ public/css
 Dockerfile
 .dockerignore
 docker-compose*.yml
+store
+dumps
+.pnpm-store

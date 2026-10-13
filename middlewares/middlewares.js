@@ -29,7 +29,7 @@ export const checkRateLimit = (_req, res, next) => {
     return next();
   }
 
-  next(new AppError('Quora is rate limiting this instance. Try another or host your own.', 503));
+  next(new AppError('Quora está limitando las peticiones. Prueba en un rato.', 503));
 };
 
 export const setCache = catchAsyncErrors(async (_req, res, next) => {

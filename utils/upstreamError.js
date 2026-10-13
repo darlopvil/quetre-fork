@@ -28,12 +28,13 @@ const upstreamError = err => {
     const isChallenge = res.status === 403 && res.headers?.['cf-mitigated'] === 'challenge';
 
     if (isChallenge) {
-        // el interceptor ya reintentó tras re-acuñar: si llega aquí, la acuñación falló
+        // Cloudflare ya no acepta el fingerprint del transporte: no se arregla esperando,
+        // hay que actualizar CURL_IMPERSONATE y la imagen de curl-impersonate
         const e = new AppError(
-            'Cloudflare está bloqueando esta instancia y no se pudo renovar el acceso.',
+            'Cloudflare está bloqueando el acceso a Quora (fingerprint rechazado).',
             503
         );
-        e.code = 'CHALLENGE_UNSOLVED';
+        e.code = 'CHALLENGE';
         return e;
     }
 

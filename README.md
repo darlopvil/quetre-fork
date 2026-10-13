@@ -26,20 +26,28 @@ actual:
 | Cliente | Resultado |
 |---|---|
 | axios, cualquier combinación de cabeceras | challenge |
-| curl-impersonate con fingerprint antiguo (chrome116) | challenge |
+| curl-impersonate con fingerprint antiguo (chrome146, safari260) | challenge |
+| impit 0.14.x, fingerprint de Chrome | challenge (pasaba hasta octubre de 2026) |
 | curl-impersonate con fingerprint reciente (chrome150) | **200** |
-| impit, fingerprint de Chrome | **200** |
 
-**Conclusión:** Cloudflare ya no reta a todo el mundo, solo a clientes con
+**Conclusión:** Cloudflare no reta a todo el mundo, solo a clientes con
 fingerprint anómalo. Un cliente HTTP que replique el saludo de un navegador
-pasa sin reto y sin cookies de por medio.
+reciente pasa sin reto y sin cookies de por medio.
+
+**Los fingerprints caducan.** Lo que hoy pasa deja de pasar cuando esa versión
+de navegador envejece: chrome146 pasaba a finales de agosto y en octubre ya no;
+impit dejó de pasar el mismo día. Por eso el perfil imitado es configuración
+(`CURL_IMPERSONATE`) y no código. Cuando aparezca el error *fingerprint
+rechazado*, se sube la versión de la imagen de curl-impersonate en el
+`Dockerfile` y se pone en `.env` el perfil más reciente que traiga.
 
 > **Nota histórica.** Hasta agosto de 2026 Cloudflare retaba a todos por igual,
 > incluido un navegador real. La solución entonces fue distinta: un navegador
 > headless resolvía el reto y la `cf_clearance` resultante se reutilizaba desde
 > un cliente HTTP normal. Cuando Cloudflare relajó la regla, esa arquitectura
 > dejó de funcionar por un motivo curioso: sin reto no se emite clearance, así
-> que no había nada que acuñar. Se sustituyó por el transporte con fingerprint.
+> que no había nada que acuñar. Se sustituyó por el transporte con fingerprint:
+> primero impit y, cuando su fingerprint envejeció, curl-impersonate.
 
 ---
 
@@ -48,7 +56,7 @@ pasa sin reto y sin cookies de por medio.
 ```
 petición → ¿caché fresca en Redis?  → sí → servir
          → ¿?archived=1 y hay copia? → sí → servir del disco
-         → no → cola → impit (fingerprint de Chrome)
+         → no → cola → curl-impersonate (fingerprint de Chrome reciente)
          → si falla → copia caducada de Redis, o del archivo en disco
 ```
 
@@ -67,9 +75,13 @@ En la práctica: ~0,06 s con caché, ~1,4 s contra Quora.
 
 ### Piezas
 
-- **`utils/http.js`** — transporte hacia Quora con fingerprint de navegador.
+- **`utils/http.js`** — transporte hacia Quora con fingerprint de navegador:
+  ejecuta el binario de curl-impersonate, que se copia en la imagen desde la
+  oficial. La URL, las cabeceras y las cookies viajan por stdin y no como
+  argumentos, para que la sesión no sea visible en la lista de procesos.
   Gestiona el jar de cookies, extrae la revisión del frontend del HTML y
   replica la forma de error de axios para no acoplar el resto del código.
+  Un challenge de Cloudflare no activa el cooldown: esperar no lo arregla.
 - **`utils/imageClient.js`** — cliente aparte para el proxy de imágenes. Va al
   CDN, sin Cloudflare delante, y necesita respuesta en streaming.
 - **`utils/queue.js`** — serializa las peticiones a Quora con intervalo mínimo
@@ -133,6 +145,11 @@ está limpia y el bloqueo es por fingerprint de cliente. Cloudflare puntúa
 reputación de red, y las IPs de datacenter tienen peor score que una
 residencial: introducirlas empeoraría el problema.
 
+**impit como transporte.** Fue el transporte entre agosto y octubre de 2026.
+Su fingerprint de Chrome dejó de pasar y la última versión publicada tampoco
+pasaba, mientras curl-impersonate ya traía un perfil más reciente. curl-impersonate
+publica perfiles nuevos antes y permite elegir el perfil exacto.
+
 **Navegador headless como transporte.** Funciona, pero cuesta ~4 s por petición
 frente a ~1,4 s, y arrastra un Chromium con su consumo de memoria. Solo tuvo
 sentido mientras Cloudflare retaba a todos los clientes.
@@ -144,11 +161,6 @@ transporte.
 **Cola dentro del cliente HTTP.** El proxy de imágenes usaba la misma instancia
 pero apunta al CDN: serializarlo haría que cada página tardase una eternidad.
 La cola vive en los fetchers.
-
-**Cola dentro del cliente HTTP.** El proxy de imágenes comparte instancia pero
-apunta al CDN: serializarlo haría que cada página tardase una eternidad.
-Además, el reintento tras re-acuñar vuelve a pasar por el interceptor, por lo
-que una cola ahí se auto-bloquearía. La cola vive en los fetchers.
 
 ---
 
@@ -165,6 +177,9 @@ Además de las variables de upstream:
 | `QUORA_BASE_URL` | `https://www.quora.com` | Origen. Solo se cambia para pruebas, p. ej. apuntando a un host inalcanzable para verificar el rescate desde disco. |
 | `QUORA_SESSION_COOKIES` | — | Cookies de sesión (`m-b=...; m-s=...`) para la búsqueda. Sin ellas, `/search` devuelve `SEARCH_NEEDS_SESSION`. El resto del servicio no las usa. |
 | `SEARCH_QUERY_HASH` | (valor actual) | Hash de la consulta persistida de búsqueda. Cambia cuando Quora recompila su frontend. |
+| `CURL_IMPERSONATE` | `chrome150` | Perfil de navegador que imita el transporte. Ha de existir en la versión de curl-impersonate del `Dockerfile`. |
+| `CURL_IMPERSONATE_BIN` | `curl-impersonate` | Ruta del binario dentro del contenedor. |
+| `UPSTREAM_TIMEOUT` | `30` | Tiempo máximo por petición a Quora (s). |
 
 Redis pasa de opcional a **muy recomendable**: sin él no hay caché y cada
 visita golpea a Quora.
@@ -254,12 +269,13 @@ Aparecen en el log como `[CÓDIGO] mensaje (detalle) → url`.
 |---|---|
 | `NOT_FOUND` | La página no existe en Quora. |
 | `RATE_LIMITED` | Quora está limitando (429). Activa cooldown. |
-| `FORBIDDEN` | Quora rechazó la petición (403). Activa cooldown. |
+| `CHALLENGE` | Cloudflare rechaza el fingerprint (403 con `cf-mitigated: challenge`). No activa cooldown: hay que actualizar el perfil de curl-impersonate. |
+| `FORBIDDEN` | Quora rechazó la petición (403 sin challenge). Activa cooldown. |
 | `NOT_A_SLUG` | La ruta no tiene forma de slug de Quora. No se reenvía. |
 | `SEARCH_NEEDS_SESSION` | La búsqueda requiere sesión configurada. |
 | `EMPTY_PAYLOAD` | 200 sin datos: Quora cambió el marcado. Genera un volcado. |
 | `UPSTREAM_ERROR` | Quora devuelve 5xx. |
-| `NETWORK` | No se pudo contactar. |
+| `NETWORK` | No se pudo contactar. El detalle lleva el código de salida de curl (`CURL_28` timeout, `CURL_6` DNS, `CURL_7` conexión). |
 | `INTERNAL` | Error de programación. Conserva traza. |
 
 ### Purgar la caché
